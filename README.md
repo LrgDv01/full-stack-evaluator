@@ -1,25 +1,25 @@
 # 🧪 Full-Stack Evaluator – Technical Exam Submission
 
-Welcome to my submission for the technical evaluation!
+Welcome to my technical evaluation submission!
 
-This monorepo contains both the **backend (.NET 9 Web API)** and **frontend (React)** projects. I've built and fixed key parts of this intentionally incomplete system, addressing quirks and thinking like a dev in real-world scenarios.
+This monorepo contains both the **backend (.NET 9 Web API)** and **frontend (React)** projects. I've started building and fixing key parts of this intentionally incomplete system, addressing quirks as I go and thinking like a dev in real-world scenarios.
 
 ---
 
 ## ⏱️ Time Limit
 
 **4 to 5 hours**  
-I treated this as a timed test, focusing on core functionality without overthinking peripherals.
+I'm treating this as a timed test, focusing on core setup without overthinking yet.
 
 ---
 
-## 🎯 Objectives Achieved
+## 🎯 Objectives
 
-- ✅ Connected the frontend to the existing API, handling partial data and errors.
-- 🔧 Implemented or completed missing backend logic, such as [briefly list what you plan to or have done, e.g., EF Core interactions and API endpoints].
-- 🔄 Managed real-world scenarios like incomplete data, API failures, and state management.
-- 💅 Ensured code is clean, structured, and readable with comments where needed.
-- 📦 Committed regularly to show my thought process — check the history!
+- ✅ Connect frontend to the existing API (in progress)
+- 🔧 Implement or complete missing backend logic (starting with setup)
+- 🔄 Handle real-world scenarios (partial data, errors, state)
+- 💅 Code should be clean, structured, and readable
+- 📦 Commit regularly — **no one big fat commit**
 
 ---
 
@@ -35,26 +35,19 @@ I treated this as a timed test, focusing on core functionality without overthink
 ### Frontend
 
 - React + Axios
-- Redux Toolkit (if implemented)
+- Redux Toolkit (if I add it later)
 - Vite (dev server)
-- Styling: [e.g., Tailwind CSS or your choice]
+- Styled with Tailwind CSS (my choice for simplicity)
 
 ---
 
-## ✅ Submission Notes
-- This is pushed to my public GitHub repo: https://github.com/LrgDv01/full-stack-evaluator
-- What I implemented: [Add details here as you go, e.g., "Fixed API quirks in task endpoints, added error handling in React components."]
-- What’s missing (if any): [e.g., "Advanced auth not implemented due to time; basic access control added."]
-- How to test: 
-  1. Clone the repo: `git clone https://github.com/LrgDv01/full-stack-evaluator.git`
-  2. Set up backend: Navigate to `/backend`, run `dotnet ef database update`, then `dotnet run`.
-  3. Set up frontend: Navigate to `/frontend`, run `npm install` then `npm run dev`.
-  4. Test API via Swagger at `http://localhost:5000/swagger`, and frontend at `http://localhost:5173`.
+## ✅ Submission Write-Up
+- **What I've Implemented So Far**: Initialized the monorepo structure with /backend and /frontend folders. Added personalized READMEs to document the project. Set up commit guidelines based on our discussions about showing incremental progress.
+- **What’s Missing (If Any)**: Actual code implementation—next steps include cloning the original backend repo, applying migrations, and connecting the frontend via Axios. I'll handle API quirks like incomplete endpoints as I discover them.
+- **How to Test My Changes**: 
+  1. Clone my repo: `git clone https://github.com/LrgDv01/full-stack-evaluator.git`
+  2. Navigate to /backend, install .NET 9 SDK and PostgreSQL, then run `dotnet ef database update` and `dotnet run`.
+  3. Navigate to /frontend, run `pnpm install` and `pnpm run dev`.
+  4. Check Swagger for API (once running) and frontend for basic connections.
 
-
-Procedural :
-
-     - "VS Code extension composition errors - updated extensions, app still runs successfully"
-
-
-I built smart and coded loud. 💻🔥
+Good luck reviewing my work. I'm building smart and coding loud! 💻🔥

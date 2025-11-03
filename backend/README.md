@@ -1,6 +1,6 @@
-# .NET Task Evaluator API – Technical Exam Submission
+# .NET Task Evaluator API – My Technical Exam Submission
 
-⏰ **Estimated Time Spent**: 2–3 hours  
+⏰ **Estimated Time Spent So Far**: 2–3 hours (setup phase)  
 🔧 **Tech Stack**:
 - .NET 9 Web API  
 - PostgreSQL  
@@ -11,17 +11,21 @@
 
 ## 🧪 Setup Instructions
 
-### 1. Navigate to this folder
+### 1. Navigate to This Folder
+From my monorepo root: `cd backend`
 
-Assuming you're in the monorepo root, `cd backend` (or your folder name).
+### 2. Set up the Environment
+Make sure you have the .NET 9 SDK and PostgreSQL installed. Configure your local database connection string in appsettings.json as needed (e.g., for my local setup).
 
-### 2. Set up the environment
-Ensure .NET 9 SDK and PostgreSQL are installed. Updated the database connection string in `appsettings.json` if needed (e.g., for your local Postgres instance).
-
-### 3. Apply database migrations
-Run this to create/update the schema:
+### 3. Apply Database Migrations
+Run the following command to create the database schema:
 
 ```bash
-dotnet ef database update 
-# then 
+dotnet ef database update
+```
+### 4. Run the API
+Run the command to Run the API 
+
+```bash
 dotnet run
+```
