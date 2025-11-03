@@ -16,10 +16,12 @@
 Assuming you're in the monorepo root, `cd backend` (or your folder name).
 
 ### 2. Set up the environment
-Ensure .NET 9 SDK and PostgreSQL are installed. Update the database connection string in `appsettings.json` if needed (e.g., for your local Postgres instance).
+Ensure .NET 9 SDK and PostgreSQL are installed. Updated the database connection string in `appsettings.json` if needed (e.g., for your local Postgres instance).
 
 ### 3. Apply database migrations
 Run this to create/update the schema:
 
 ```bash
-dotnet ef database update
+dotnet ef database update 
+# then 
+dotnet run

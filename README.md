@@ -51,4 +51,4 @@ I treated this as a timed test, focusing on core functionality without overthink
   3. Set up frontend: Navigate to `/frontend`, run `npm install` then `npm run dev`.
   4. Test API via Swagger at `http://localhost:5000/swagger`, and frontend at `http://localhost:5173`.
 
-Good luck reviewing! I built smart and coded loud. 💻🔥
+I built smart and coded loud. 💻🔥
