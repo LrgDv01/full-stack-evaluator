@@ -30,3 +30,4 @@
 3. Install dependencies: `pnpm install`
 4. Run the dev server: `pnpm run dev`
 5. The app will be available at http://localhost:5173 – ensure the backend is running for API calls.
+6. Using `pnpm` for all frontend installs to optimize speed; removed `npm` artifacts.
