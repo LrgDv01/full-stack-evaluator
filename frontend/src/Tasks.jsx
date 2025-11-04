@@ -5,29 +5,11 @@ function Tasks() {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    api.get('/task')
+    api.get('/tasks')
       .then(res => setTasks(res.data))
       .catch(err => console.error(err));
-
-    // const arr = [
-    //     {
-    //       id : 0,
-    //       title : "Magtanim",
-    //       rewards : "Foods",
-    //       isDone : true,
-    //       isRecieved : true,
-    //     },
-    //     {
-    //       id : 1,
-    //       title : "Magluto",
-    //       rewards : "Foods",
-    //       isDone : true,
-    //       isRecieved : true,
-    //     }
-    // ];
-
-  // setTasks(arr)
   }, []);
+  
   console.log(" TEST TASK ", typeof(tasks));
   console.log(" TEST VALUE ", tasks);
   console.log(" TEST LENGTH ", tasks.length);
