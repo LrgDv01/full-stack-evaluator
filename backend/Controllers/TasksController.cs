@@ -18,11 +18,17 @@ namespace TaskManager.API
             _context = context;
         }
 
-        [HttpGet] // For GET, maybe add a query param later for user-specific tasks. > TODO later
-        public async Task<IActionResult> Get()
+        [HttpGet] // Get all tasks, optionally filter by UserId
+        public async Task<IActionResult> Get([FromQuery] int? userId = null)
         {
+            var query = _context.Tasks.AsQueryable();
+            if (userId.HasValue)
+            {
+                query = query.Where(t => t.UserId == userId.Value); 
+                // query = query.Where(t => t.UserId == userId.Value).Include(t => t.User); // Optional: Include user details
+            }
             
-            var tasks = await _context.Tasks.ToListAsync();
+            var tasks = await query.ToListAsync(); 
             return Ok(tasks);
         }
 
@@ -45,17 +51,12 @@ namespace TaskManager.API
         {
             if (!ModelState.IsValid) return BadRequest(ModelState); // Validate the incoming model using Built-in validation.
 
-            // Check if UserId exists
-            var userExists = await _context.Users.AnyAsync(u => u.Id == updated.UserId);
-            if (!userExists) return BadRequest($"Invalid UserId - user with Id {updated.UserId} does not exist.");
-
             var task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
 
             task.Title = updated.Title;
             task.IsDone = updated.IsDone;
             await _context.SaveChangesAsync();
-
             return Ok(task);
         }
 
