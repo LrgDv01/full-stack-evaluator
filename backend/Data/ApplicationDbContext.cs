@@ -19,15 +19,16 @@ namespace TaskManager.Data
 
             modelBuilder.Entity<User>(entity => // Configure User entity
             {
-                entity.HasKey(e => e.Id); 
-                entity.Property(e => e.Email).IsRequired(); // Ensure Email is required
-                entity.Property(e => e.PasswordHash).IsRequired(); 
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Email).IsUnique(); // Ensure unique emails
+                // entity.Property(e => e.Email);
+                // entity.Property(e => e.PasswordHash); 
             });
 
-            modelBuilder.Entity<TaskItem>(entity => 
+            modelBuilder.Entity<TaskItem>(entity => // Configure TaskItem entity
             {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Title).IsRequired(); 
+                // entity.Property(e => e.Title); 
                 entity.HasOne(e => e.User) 
                       .WithMany(u => u.Tasks)
                       .HasForeignKey(e => e.UserId) 
