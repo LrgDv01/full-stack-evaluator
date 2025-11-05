@@ -27,7 +27,7 @@ function Tasks() {
   if (error) return <p>Error: {error}</p>;
   return (
     <div>
-      <h2>Tasks</h2>
+      <h1 className='bg-blue-200 p-4 m-5 text-black'>Tasks</h1>
       <ul>
         {tasks.map(task => (
           <li key={task.id}>
