@@ -8,11 +8,12 @@ namespace TaskManager.Models
 
         [Required] // Ensure Email is provided
         [EmailAddress] // Validate email format
-        public string Email { get; set; } = string.Empty;
+        [StringLength(256, ErrorMessage = "Email too long")] // Max length constraint
+        public string Email { get; set; } = string.Empty; 
 
         [Required] // Ensure PasswordHash is provided
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")] // Basic length constraint
-        public string PasswordHash { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty; 
         
         public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
     }
