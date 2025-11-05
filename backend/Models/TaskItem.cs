@@ -1,11 +1,18 @@
+using System.ComponentModel.DataAnnotations; // For data annotations
+
 namespace TaskManager.Models
 {
     public class TaskItem
     {
         public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Title is required")] // Title must be provided
+        [StringLength(100, ErrorMessage = "Title can't be longer than 100 characters")] // Max length constraint
+        public string Title { get; set; } = string.Empty; 
         public bool IsDone { get; set; }
+
+        [Required] // Ensure UserId is provided
         public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public User? User { get; set; } // Make nullable to avoid required warnings
     }
 }
