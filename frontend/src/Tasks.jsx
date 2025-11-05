@@ -27,18 +27,28 @@ function Tasks() {
   if (error) return <p>Error: {error}</p>;
   return (
     <div>
-      <h1 className='bg-blue-200 p-4 m-5 text-black'>Tasks</h1>
-      <ul>
-        {tasks.map(task => (
-          <li key={task.id}>
-            {task.title} {task.isDone ? '✅' : '❌'}  
-          </li>
-        ))}
-      </ul>
-      <button>Add Task</button>
-      <button>Update Task</button>
-      <button>Delete Task</button>
-
+      <h1 className=' p-4 m-5 text-3xl font-bold rounded-xl'>Tasks</h1>
+      <div className='p-4 m-5 text-l rounded-xl border-2 border-gray-300'>
+       
+      {tasks.length === 0 ? 
+      (
+        <p>- No task at the moment, comeback for later.</p>
+      ) : (
+        <ul>
+          {tasks.map(task => (
+            <li key={task.id}>
+              {task.title} {task.isDone ? '✅' : '❌'}
+            </li>
+          ))}
+        </ul>
+      )}
+ 
+      </div>
+      <div className='flex justify-center'> 
+        <button className='bg-blue-500 p-2 m-3 w-1/4'>Add Task</button>
+        <button className='bg-blue-500 p-2 m-3 w-1/4'>Update Task</button>
+        <button className='bg-blue-500 p-2 m-3 w-1/4'>Delete Task</button>
+      </div>
     </div>
   );
 }
