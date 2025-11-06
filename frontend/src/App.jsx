@@ -1,5 +1,5 @@
-import './App.css'
-import Tasks from "./Tasks"
+import './styles/App.css'
+import Tasks from "./pages/Tasks/Tasks"
 
 function App() {
   return (
