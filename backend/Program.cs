@@ -8,12 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Enable CORS for development environment
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"]?.Split(',') ?? new[] { "http://localhost:5173" };  // Fallback if not set
     options.AddPolicy("DevCorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // Vite dev server origin
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials(); // If adding auth later
+              .AllowCredentials(); // Allow credentials if needed
     });
 });
 
