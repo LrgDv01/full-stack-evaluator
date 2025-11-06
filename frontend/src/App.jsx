@@ -8,6 +8,7 @@ function App() {
   // State for the list of tasks and any fetch error
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Fetch tasks when the app loads
   useEffect(() => {
@@ -29,7 +30,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1 className="font-bold text-5xl">React Task Evaluator</h1>
+      <h1 className="font-bold text-5xl text-center my-8">React Task Evaluator</h1>
 
       {/* Show error banner if something went wrong */}
       {error && (
@@ -39,7 +40,12 @@ function App() {
       )}
 
       {/* Pass tasks (and a refetch function) down to the Tasks page */}
-      <Tasks tasks={tasks} onRefresh={() => window.location.reload()} />
+    <Tasks 
+      tasks={tasks} 
+      onRefresh={() => window.location.reload()} 
+      currentUser={currentUser}
+      setCurrentUser={setCurrentUser}
+    />
     </div>
   );
 }
