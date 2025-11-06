@@ -21,8 +21,6 @@ namespace TaskManager.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.Email).IsUnique(); // Ensure unique emails
-                // entity.Property(e => e.Email);
-                // entity.Property(e => e.PasswordHash); 
             });
 
             modelBuilder.Entity<TaskItem>(entity => // Configure TaskItem entity
