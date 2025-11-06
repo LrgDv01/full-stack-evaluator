@@ -1,53 +1,31 @@
-# 🧪 Full-Stack Evaluator – Technical Exam Submission
+# Full-Stack Evaluator — README (Root)
 
-Welcome to my technical evaluation submission!
+## DOCUMENTATION > STEPS
 
-This monorepo contains both the **backend (.NET 9 Web API)** and **frontend (React)** projects. I've started building and fixing key parts of this intentionally incomplete system, addressing quirks as I go and thinking like a dev in real-world scenarios.
+This section outlines the high-level steps to get the project running, and points to detailed instructions in each subfolder's README.
 
----
+### 1. Fork & Clone
 
-## ⏱️ Time Limit
+* Fork the repository to your GitHub account.
+* Clone your fork locally:
 
-**4 to 5 hours**  
-I'm treating this as a timed test, focusing on core setup without overthinking yet.
+  ```bash
+  git clone https://github.com/<your-account>/full-stack-evaluator.git
+  cd full-stack-evaluator
+  ```
+* Push initial setup / commits frequently to show progress.
 
----
+### 2. Install prerequisites (high-level)
 
-## 🎯 Objectives
+* Backend: See `backend/README.md` for full .NET 9 + PostgreSQL setup.
+* Frontend: See `frontend/README.md` for Node.js + pnpm + Tailwind setup.
 
-- ✅ Connect frontend to the existing API (in progress)
-- 🔧 Implement or complete missing backend logic (starting with setup)
-- 🔄 Handle real-world scenarios (partial data, errors, state)
-- 💅 Code should be clean, structured, and readable
-- 📦 Commit regularly — **no one big fat commit**
+### 3. Run order
 
----
-
-## 📦 Stack Overview
-
-### Backend
-
-- .NET 9 Web API
-- Entity Framework Core
-- PostgreSQL
-- Swagger docs
-
-### Frontend
-
-- React + Axios
-- Redux Toolkit (if I add it later)
-- Vite (dev server)
-- Styled with Tailwind CSS (my choice for simplicity)
+1. Backend first. Run migrations if needed: `dotnet ef database update`.
+2. Frontend next: `pnpm run dev`.
+3. Verify via Swagger and UI.
 
 ---
 
-## ✅ Submission Write-Up
-- **What I've Implemented So Far**: Initialized the monorepo structure with /backend and /frontend folders. Added personalized READMEs to document the project. Set up commit guidelines based on our discussions about showing incremental progress.
-- **What’s Missing (If Any)**: Actual code implementation—next steps include cloning the original backend repo, applying migrations, and connecting the frontend via Axios. I'll handle API quirks like incomplete endpoints as I discover them.
-- **How to Test My Changes**: 
-  1. Clone my repo: `git clone https://github.com/LrgDv01/full-stack-evaluator.git`
-  2. Navigate to /backend, install .NET 9 SDK and PostgreSQL, then run `dotnet ef database update` and `dotnet run`.
-  3. Navigate to /frontend, run `pnpm install` and `pnpm run dev`.
-  4. Check Swagger for API (once running) and frontend for basic connections.
-
-Good luck reviewing my work. I'm building smart and coding loud! 💻🔥
+For detailed steps, see `/backend` and `/frontend` READMEs.

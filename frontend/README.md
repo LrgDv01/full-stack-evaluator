@@ -1,33 +1,203 @@
-# 🧪 React Task Evaluator Frontend – My Submission
+# Frontend README (React + Vite)
 
-⏰ **Estimated Time Spent So Far**: 1-2 hours (planning phase)  
-🔧 **Tech Stack**:
-- [React 18+](https://reactjs.org/)
-- [Vite](https://vitejs.dev/)
-- [Axios](https://axios-http.com/)
-- My choice: Tailwind CSS for quick styling (logic over looks, as emphasized)
+## 📚 Table of Contents
 
-## 🎯 Objectives
+1. Overview
+2. Prerequisites & Installation
+3. Why pnpm instead of npm?
+4. Project Setup & Commands
+5. Tailwind CSS Setup
+6. Vite Proxy & CORS Integration
+7. Cleaning npm Artifacts / Switching Fully to pnpm
+8. .module.css Explanation
+9. Environment Variables (.env)
+10. Run Frontend
 
-- ✅ Connect to a RESTful API (with some "quirks") – see my backend: [Full-Stack Evaluator Backend](https://github.com/LrgDv01/full-stack-evaluator/tree/main/backend)
-- 🛠️ Implement features with partial or ambiguous requirements (planning to add task views)
-- ⚠️ Identify places where API usage is unsafe or incomplete (will fix as I connect)
-- 🧠 Show thought process via commits, comments, or UI choices  
-- 📦 Handle API failures gracefully (e.g., loading states from our past React talks)
-- 🚀 Add features I think are missing, like basic error modals
+---
 
-### 📦 Guidelines Followed
+## 1. Overview
 
-- This isn't about pixel-perfect UI. Logic > Looks.
-- **Commit often** so reviewers can follow my thought process (like in our commit message discussions).
-- I'll leave `TODO` or `FIXME` comments if something’s unclear or unfinished.
-- I'm free to use libs—just being transparent (e.g., might add React Router if needed).
-- Assumptions: API runs locally; I'll clarify in commits if quirks arise, like incomplete data handling.
+This is the frontend of the Full-Stack Evaluator project, built using **React 18 + Vite** for high-speed development, with optional **pnpm** as the package manager and **Tailwind CSS** for styling.
 
-### Setup Instructions
-1. Navigate to this folder from the monorepo root: `cd frontend`
-2. Using `pnpm` instead of `npm` for frontend package management for faster installs and efficiency. Fallback to `npm` if needed.
-3. Install dependencies: `pnpm install`
-4. Run the dev server: `pnpm run dev`
-5. The app will be available at http://localhost:5173 – ensure the backend is running for API calls.
-6. Using `pnpm` for all frontend installs to optimize speed; removed `npm` artifacts.
+---
+
+## 2. Prerequisites & Installation
+
+* Install **Node.js (v18+)** from [https://nodejs.org/](https://nodejs.org/)
+  Verify installation:
+
+  ```bash
+  node -v
+  ```
+* Install **pnpm (recommended)** globally:
+
+  ```bash
+  npm install -g pnpm
+  ```
+* Install dependencies inside `/frontend`:
+
+  ```bash
+  cd frontend
+  pnpm install
+  ```
+
+  > You can use `npm install` if preferred, but pnpm is faster and more efficient.
+
+---
+
+## 3. Why pnpm instead of npm?
+
+| Feature              | pnpm                             | npm                     |
+| -------------------- | -------------------------------- | ----------------------- |
+| Speed                | ✅ 2–3× faster installs           | ❌ Slower                |
+| Disk Usage           | ✅ Saves space via global store   | ❌ Duplicates packages   |
+| Dependency Isolation | ✅ Stricter & safer               | ⚠️ Can have conflicts   |
+| Monorepo Support     | ✅ Excellent (frontend + backend) | ⚠️ Requires workarounds |
+| Recommended By       | Vite, modern React apps          | Default Node.js         |
+
+**Reason for this project:** Faster setup for timed evaluation (4–5h total), better package isolation, cleaner structure.
+
+---
+
+## 4. Project Setup & Commands
+
+| Command        | Description                                                                            |
+| -------------- | -------------------------------------------------------------------------------------- |
+| `pnpm install` | Install all dependencies                                                               |
+| `pnpm run dev` | Start Vite development server (default [http://localhost:5173](http://localhost:5173)) |
+| `pnpm build`   | Production build                                                                       |
+| `pnpm preview` | Preview production build                                                               |
+
+---
+
+## 5. Tailwind CSS Setup
+
+1. Install Tailwind:
+
+   ```bash
+   pnpm add -D tailwindcss postcss autoprefixer
+   npx tailwindcss init -p
+   ```
+2. Configure `tailwind.config.js`:
+
+   ```js
+   export default {
+     content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+     theme: {
+       extend: {},
+     },
+     plugins: [],
+   }
+   ```
+3. Add Tailwind to `src/index.css` or `src/tailwind-input.css`:
+
+   ```css
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   ```
+
+---
+
+## 6. Vite Proxy & CORS Integration
+
+✔ Backend URL (example): `http://localhost:5215`
+✔ Frontend runs at: `http://localhost:5173`
+
+**In `vite.config.js`:**
+
+```js
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5215',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+})
+```
+
+**Backend (`Program.cs`) CORS config:**
+
+```csharp
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost", policy =>
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
+var app = builder.Build();
+app.UseCors("AllowLocalhost");
+```
+
+**✅ Why use both?**
+
+| Feature              | Vite Proxy            | Backend CORS  |
+| -------------------- | --------------------- | ------------- |
+| Dev Convenience      | ✅ Yes                 | ⚠️ Not needed |
+| Works Without Proxy  | ❌ No                  | ✅ Yes         |
+| Production Required? | ❌ No                  | ✅ Yes         |
+| Best Practice Combo  | ✅✅ Both used together |               |
+
+---
+
+## 7. Cleaning npm Artifacts / Switch Fully to pnpm
+
+```bash
+# Inside /frontend folder
+rm -rf node_modules package-lock.json
+pnpm install
+```
+
+Creates `pnpm-lock.yaml` → commit this file.
+
+✅ Optional Commit Message:
+
+> "Switched fully to pnpm, removed npm artifacts for consistent dependency management."
+
+---
+
+## 8. .module.css Explanation
+
+`.module.css` is used because:
+✔ Scopes CSS only to components that import it.
+✔ Prevents global class name conflicts.
+✔ Automatically generates unique class names.
+✔ Recommended by React for scalable UI.
+
+---
+
+## 9. Environment Variables (.env)
+
+Example `.env` file:
+
+```env
+VITE_API_BASE_URL="http://localhost:5215/api"
+VITE_APP_TITLE="Task Manager App"
+```
+
+Usage in code:
+
+```js
+const api = import.meta.env.VITE_API_BASE_URL;
+```
+
+✅ .env is optional but useful for API URLs, app titles, keys, etc.
+
+---
+
+## 10. Run Frontend
+
+```bash
+cd frontend
+pnpm install
+pnpm run dev
+```
+
+Access at: `http://localhost:5173`
+
