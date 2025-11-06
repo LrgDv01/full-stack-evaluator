@@ -1,3 +1,4 @@
+// To test direct CORS : Temporarily disable the proxy (comment out the proxy config) below.
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 

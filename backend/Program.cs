@@ -5,15 +5,17 @@ DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("DevCorsPolicy", policy =>
-//     {
-//         policy.WithOrigins("http://localhost:5173") // Specific to Vite port
-//               .AllowAnyMethod()
-//               .AllowAnyHeader();
-//     });
-// });
+// Enable CORS for development environment
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCorsPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Vite dev server origin
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // If adding auth later
+    });
+});
 
 builder.Services.AddControllers().AddJsonOptions(opt =>
     opt.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles); // Prevent cycles in JSON serialization
@@ -34,8 +36,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapControllers();
-// app.UseCors("DevCorsPolicy");
+app.UseCors("DevCorsPolicy"); // Apply CORS policy
+app.MapControllers(); 
 
 app.Run();
 
