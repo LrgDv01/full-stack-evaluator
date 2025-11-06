@@ -16,9 +16,9 @@ namespace TaskManager.Models
         public string Email { get; set; } = string.Empty;
 
         [Required] // Ensure PasswordHash is provided
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")] // Basic length constraint
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")] // Basic length constraint (applies to plain before hash)
         public string PasswordHash { get; set; } = string.Empty;
 
-        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
+        public virtual ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>(); // Improvement: Virtual for lazy loading if needed
     }
 }

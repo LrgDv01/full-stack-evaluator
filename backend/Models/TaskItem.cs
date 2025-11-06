@@ -7,7 +7,7 @@ namespace TaskManager.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Title is required")] // Title must be provided
-        [StringLength(100, ErrorMessage = "Title can't be longer than 100 characters")] // Max length constraint
+        [StringLength(200, ErrorMessage = "Title can't be longer than 200 characters")] // Fix: Match DbContext max length
         public string Title { get; set; } = string.Empty; 
         public bool IsDone { get; set; }
 
