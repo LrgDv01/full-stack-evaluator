@@ -1,0 +1,17 @@
+:root {
+  --primary: #2563eb;
+  --secondary: #64748b;
+  --background: #f9fafb;
+  --text-dark: #1f2937;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #3b82f6;
+    --secondary: #94a3b8;
+    --background: #1f2937;
+    --text-dark: #f9fafb;
+  }
+}

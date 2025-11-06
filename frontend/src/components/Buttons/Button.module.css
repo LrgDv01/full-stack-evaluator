@@ -1,0 +1,18 @@
+.button {
+  background: blue;
+  color: white;
+  padding: 10px;
+}
+.button:hover {
+  background: darkblue;
+}
+.button:active {
+  background: navy;
+}
+.button:disabled {
+  background: gray;
+  cursor: not-allowed;
+}   
+.button {
+  @apply bg-blue-500 text-white p-2 m-3 w-1/4;
+}
