@@ -71,7 +71,7 @@ const UserForm = ({ userId = null, onSuccess }) => {  // Props: userId for updat
         />
       </div>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}  // Error in red with Tailwind
+      {error && <p className="text-red-500 mb-4">{error}</p>}  {/* Error in red with Tailwind */}
 
       <button type="submit" disabled={loading} className="bg-blue-500 text-white p-2 rounded">
         {loading ? 'Saving...' : (userId ? 'Update' : 'Create')}

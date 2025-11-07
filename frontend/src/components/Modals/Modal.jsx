@@ -7,7 +7,7 @@ function Modal({ children, onClose }) {
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
         >
-          <X className="h-6 w-6" />
+          {/* <X className="h-6 w-6" /> */}
         </button>
         {children}
       </div>
