@@ -3,21 +3,17 @@ using TaskManager.Models.Dtos;
 
 namespace TaskManager.Models.Dtos
 {
-    public class UserDto
+  public class UserDto
     {
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        [EmailAddress]
-        [StringLength(256)]
+        [Required, EmailAddress, StringLength(256)]
         public string Email { get; set; } = string.Empty;
 
-        [Required]
-        [MinLength(8)]
-        public string Password { get; set; } = string.Empty;  // Plain password—hash in controller
+        [Required, MinLength(8)]
+        public string Password { get; set; } = string.Empty;   
 
-        public List<TaskItemDto> Tasks { get; set; } = new List<TaskItemDto>();  // Optional tasks
+        public List<TaskItemDto>? Tasks { get; set; }  // Optional: Include tasks if needed
     }
 }
