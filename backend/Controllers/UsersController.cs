@@ -6,6 +6,8 @@ using BCrypt.Net; // Added missing using for BCrypt
 
 using TaskManager.Models;
 using TaskManager.Data;
+using System.Security.Cryptography.X509Certificates;
+using TaskManager.Models.Dtos;
 
 namespace TaskManager.API
 {
@@ -19,7 +21,9 @@ namespace TaskManager.API
         {
             _context = context;
         }
-
+        
+        public record UserResponse(int Id, string Name, string Email, int TaskCount); // Response DTO without password hash
+    
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -27,59 +31,57 @@ namespace TaskManager.API
             var users = await _context.Users
                 .Select(u => new { u.Id, u.Name, u.Email, Tasks = u.Tasks.Count })
                 .ToListAsync(); // Hides hash, adds task count
-            return Ok(users); 
+            return Ok(users.Select(u => new UserResponse(u.Id, u.Name, u.Email, u.Tasks))); 
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] User user)
+        public async Task<IActionResult> Create([FromBody] UserDto userDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState); // Validate the incoming model using Built-in validation.
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // Check for existing email
-            var emailExists = await _context.Users.AnyAsync(u => u.Email == user.Email);
-            if (emailExists) return BadRequest($"Email {user.Email} is already registered.");
+            var emailExists = await _context.Users.AnyAsync(u => u.Email == userDto.Email);
+            if (emailExists) return BadRequest($"Email {userDto.Email} is already registered.");
 
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash); // Hash the password before storing
+            var user = new User
+            {
+                Name = userDto.Name,
+                Email = userDto.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password)
+            };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Return the created user without PasswordHash for security
-            return CreatedAtAction(nameof(Get), new { id = user.Id, user.Name, user.Email });
+            return CreatedAtAction(nameof(Get), new { id = user.Id }, new { user.Id, user.Email, user.Name });
         }
 
-        // TODO/FIX: fix Update to not expose PasswordHash directly
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] User updatedUser)
+        public async Task<IActionResult> Update(int id, [FromBody] UserDto updatedUserDto)
         {
-            if (id != updatedUser.Id) return BadRequest("User ID mismatch.");
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var existingUser = await _context.Users.FindAsync(id);
             if (existingUser == null) return NotFound();
 
-            if (existingUser.Email != updatedUser.Email) // Email changed
+            if (existingUser.Email != updatedUserDto.Email)
             {
-                // Check for email uniqueness if changed
-                var emailExists = await _context.Users.AnyAsync(u => u.Email == updatedUser.Email && u.Id != id);
-                if (emailExists) return BadRequest($"Email {updatedUser.Email} is already registered.");
+                var emailExists = await _context.Users.AnyAsync(u => u.Email == updatedUserDto.Email && u.Id != id);
+                if (emailExists) return BadRequest($"Email {updatedUserDto.Email} is already registered.");
             }
 
-            // Update fields
-            existingUser.Name = updatedUser.Name;
-            existingUser.Email = updatedUser.Email;
+            existingUser.Name = updatedUserDto.Name;
+            existingUser.Email = updatedUserDto.Email;
 
-            // If password is being updated, hash it            
-            if (!string.IsNullOrEmpty(updatedUser.PasswordHash))
+            if (!string.IsNullOrEmpty(updatedUserDto.Password))
             {
-                existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updatedUser.PasswordHash);
+                existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updatedUserDto.Password);
             }
 
             _context.Users.Update(existingUser);
             await _context.SaveChangesAsync();
             return NoContent();
         }
-        
+
         // TODO/FIX: Consider cascading delete implications
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
