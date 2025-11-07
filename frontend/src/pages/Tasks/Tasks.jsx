@@ -1,112 +1,36 @@
 // src/pages/Tasks/Tasks.jsx
-import { useEffect, useState } from 'react';
-import api from '../../api/axios';
+import { useState } from 'react';
 import Button from '../../components/Buttons/Button';
 import UserForm from '../../components/UserForm';
 import Modal from '../../components/modals/modal.jsx';
-import { 
-  Search, Plus, Edit2, Trash2, Check, X, GripVertical, Moon, Sun 
-} from 'lucide-react';
+import SortableTaskItem from '../../components/Tasks/SortableTaskItem';
+import { useTaskManagement } from '../../hooks/useTaskManagement';
+import { useDarkMode } from '../../hooks/useDarkMode';
+import { Search, Plus, Moon, Sun } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
-function SortableTaskItem({ task, onToggle, onEdit, onDelete, isEditing, newTitle, setNewTitle, onSaveEdit, onCancelEdit }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: task.id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`group flex items-center justify-between p-4 bg-white rounded-xl border ${
-        isDragging ? 'border-indigo-400 shadow-lg' : 'border-gray-200 shadow-sm'
-      } hover:shadow-md transition-all`}
-    >
-      <div className="flex items-center gap-3 flex-1">
-        {/* Drag Handle */}
-        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
-          <GripVertical className="h-5 w-5 text-gray-400" />
-        </div>
-
-        {/* Toggle */}
-        <button onClick={() => onToggle(task)} className="text-xl">
-          {task.isDone ? 'Completed' : 'Pending'}
-        </button>
-
-        {/* In-place Edit */}
-        {isEditing ? (
-          <form onSubmit={onSaveEdit} className="flex items-center gap-2 flex-1">
-            <input
-              type="text"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              className="flex-1 px-3 py-1 border border-indigo-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-              autoFocus
-            />
-            <button type="submit" className="text-green-600">
-              <Check className="h-5 w-5" />
-            </button>
-            <button type="button" onClick={onCancelEdit} className="text-red-600">
-              <X className="h-5 w-5" />
-            </button>
-          </form>
-        ) : (
-          <div className="flex-1">
-            <span className={`text-lg font-medium ${task.isDone ? 'line-through text-gray-500' : ''}`}>
-              {task.title}
-            </span>
-            <span className="block text-sm text-gray-500">
-              by {task.user?.email || 'Unknown'}
-            </span>
-          </div>
-        )}
-
-        {/* Edit Button */}
-        {!isEditing && (
-          <button
-            onClick={() => onEdit(task)}
-            className="opacity-0 group-hover:opacity-100 transition"
-          >
-            <Edit2 className="h-5 w-5 text-indigo-600" />
-          </button>
-        )}
-      </div>
-
-      {/* Delete */}
-      <button
-        onClick={() => onDelete(task.id)}
-        className="opacity-0 group-hover:opacity-100 transition text-red-600"
-      >
-        <Trash2 className="h-5 w-5" />
-      </button>
-    </div>
-  );
-}
 
 function Tasks({ tasks: propTasks = [], onRefresh }) {
-  const [tasks, setTasks] = useState(propTasks);
-  const [loading, setLoading] = useState(!propTasks.length);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
-  const [newTitle, setNewTitle] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useDarkMode();
+  
+  const {
+    tasks,
+    loading,
+    error,
+    editingTask,
+    setEditingTask,
+    newTitle,
+    setNewTitle,
+    createTask,
+    updateTask,
+    deleteTask,
+    updateTaskOrder
+  } = useTaskManagement(propTasks, onRefresh);
 
   // Sensors for drag-and-drop
   const sensors = useSensors(
@@ -116,55 +40,14 @@ function Tasks({ tasks: propTasks = [], onRefresh }) {
     })
   );
 
-  // Load dark mode from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('darkMode');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initial = saved ? saved === 'true' : prefersDark;
-    setDarkMode(initial);
-    if (initial) document.documentElement.classList.add('dark');
-  }, []);
 
-  // Apply dark mode
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', darkMode);
-  }, [darkMode]);
 
-  // Fetch tasks
-  useEffect(() => {
-    if (propTasks.length > 0) {
-      setTasks(propTasks);
-      setLoading(false);
-      return;
-    }
 
-    const fetchTasks = async () => {
-      try {
-        const res = await api.get('/tasks');
-        if (Array.isArray(res.data)) {
-          setTasks(res.data);
-        } else {
-          setError('Unexpected data format');
-        }
-      } catch (err) {
-        setError(err.response?.data?.title || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTasks();
-  }, [propTasks]);
 
   // Filter tasks
   const filteredTasks = tasks
     .filter(task => task.title.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => a.order - b.order); // Assuming order field exists
+    .sort((a, b) => a.order - b.order);
 
   // Drag end handler
   const handleDragEnd = async (event) => {
@@ -175,23 +58,8 @@ function Tasks({ tasks: propTasks = [], onRefresh }) {
     const newIndex = filteredTasks.findIndex(t => t.id === over.id);
     const newTasks = arrayMove(filteredTasks, oldIndex, newIndex);
 
-    // Update local state
-    setTasks(prev => {
-      const updated = [...prev];
-      newTasks.forEach((task, idx) => {
-        const original = updated.find(t => t.id === task.id);
-        if (original) original.order = idx;
-      });
-      return updated;
-    });
-
-    // Persist order to backend
     try {
-      await Promise.all(
-        newTasks.map((task, idx) =>
-          api.put(`/tasks/${task.id}`, { ...task, order: idx })
-        )
-      );
+      await updateTaskOrder(newTasks);
     } catch (err) {
       alert(`Failed to save order: ${err.message}`);
       console.error('Failed to save order:', err.message);
@@ -199,40 +67,27 @@ function Tasks({ tasks: propTasks = [], onRefresh }) {
     }
   };
 
-  // CRUD operations (same as before, with order support)
-  const createTask = async (title) => {
-    if (!title.trim() || !currentUser) return;
+  // Task handlers
+  const handleCreateTask = async (title) => {
     try {
-      const maxOrder = Math.max(...tasks.map(t => t.order || 0), -1);
-      await api.post('/tasks', {
-        title,
-        isDone: false,
-        userId: currentUser.id,
-        order: maxOrder + 1
-      });
+      if (!currentUser) {
+        alert('Please select a user before creating a task');
+        setShowCreateModal(false);
+        return;
+      }
+      await createTask(title, currentUser.id);
       setShowCreateModal(false);
-      onRefresh?.();
     } catch (err) {
-      alert(`Create failed: ${err.response?.data?.message || err.message}`);
+      alert(`Create failed: ${err.message}`);
     }
   };
 
-  const updateTask = async (task, updates) => {
-    try {
-      await api.put(`/tasks/${task.id}`, { ...task, ...updates });
-      onRefresh?.();
-    } catch (err) {
-      alert(`Update failed: ${err.response?.data?.message || err.message}`);
-    }
-  };
-
-  const deleteTask = async (id) => {
+  const handleDeleteTask = async (id) => {
     if (!window.confirm('Delete?')) return;
     try {
-      await api.delete(`/tasks/${id}`);
-      onRefresh?.();
+      await deleteTask(id);
     } catch (err) {
-      alert(`Delete failed: ${err.response?.data?.message || err.message}`);
+      alert(`Delete failed: ${err.message}`);
     }
   };
 
@@ -292,9 +147,10 @@ function Tasks({ tasks: propTasks = [], onRefresh }) {
                   <SortableTaskItem
                     key={task.id}
                     task={task}
-                    onToggle={updateTask}
+                    darkMode={darkMode}
+                    onToggle={task => updateTask(task, { isDone: !task.isDone })}
                     onEdit={(t) => { setEditingTask(t); setNewTitle(t.title); }}
-                    onDelete={deleteTask}
+                    onDelete={handleDeleteTask}
                     isEditing={editingTask?.id === task.id}
                     newTitle={newTitle}
                     setNewTitle={setNewTitle}
@@ -314,20 +170,62 @@ function Tasks({ tasks: propTasks = [], onRefresh }) {
         {/* Create Modal */}
         {showCreateModal && (
           <Modal onClose={() => setShowCreateModal(false)}>
-            <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
-            <form onSubmit={(e) => { e.preventDefault(); createTask(e.target.title.value); }} className="space-y-4">
-              <input
-                name="title"
-                type="text"
-                placeholder="Task title..."
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700"
-              />
-              <div className="flex justify-end gap-2">
-                <Button label="Cancel" onClick={() => setShowCreateModal(false)} className="bg-gray-300 text-gray-700" />
-                <Button type="submit" label="Create" />
-              </div>
-            </form>
+            <div className={`${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
+              {!currentUser && (
+                <div className="mb-4 p-3 bg-yellow-100 text-yellow-800 rounded-lg">
+                  Please select a user before creating a task
+                </div>
+              )}
+            <form onSubmit={(e) => { 
+                  e.preventDefault();
+                  const title = e.target.title.value;
+                  if (title.trim()) {
+                    handleCreateTask(title);
+                  }
+                }} 
+                className="space-y-4"
+              >
+                <div className="space-y-2">
+                  <label htmlFor="taskTitle" className="block font-medium">
+                    Task Title
+                  </label>
+                  <input
+                    id="taskTitle"
+                    name="title"
+                    type="text"
+                    placeholder="Enter your task here..."
+                    required
+                    autoFocus
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                      darkMode 
+                        ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                  />
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button 
+                    type="button"
+                    label="Cancel" 
+                    onClick={() => setShowCreateModal(false)} 
+                    className={`${
+                      darkMode 
+                        ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  />
+                  <Button 
+                    type="submit" 
+                    label="Create Task"
+                    disabled={!currentUser}
+                    className={`bg-gradient-to-r from-indigo-600 to-purple-600 text-white ${
+                      !currentUser ? 'opacity-50 cursor-not-allowed' : 'hover:from-indigo-700 hover:to-purple-700'
+                    }`}
+                  />
+                </div>
+              </form>
+            </div>
           </Modal>
         )}
       </div>
