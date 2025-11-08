@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Check, Trash2, Edit2, Undo } from 'lucide-react';
+import { GripVertical, Check, Trash2, Edit2, Undo, Eye } from 'lucide-react';  // NEW: Added Eye for view button.
 import Button from '../Buttons/Button';
 import DeleteConfirmationModal from '../Modals/DeleteConfirmationModal';
+import TaskDetailsModal from '../Modals/TaskDetailsModal';
 
-const TaskItem = ({ task, onEdit, onDelete, onToggleComplete }) => {
+
+const TaskItem = ({ task, onEdit, onDelete, onToggleComplete, onView }) => {  // NEW: Added onView prop.
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const {
@@ -67,6 +69,14 @@ const TaskItem = ({ task, onEdit, onDelete, onToggleComplete }) => {
             {task.isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
           </span>
         </Button>
+             {/* NEW: Added View Details button before Edit/Delete. */}
+        <Button
+          variant="secondary"
+          size="sm"
+          icon={<Eye className="h-5 w-5" />}
+          onClick={() => onView(task)}
+          aria-label="View task details"
+        />
         <Button
           variant="secondary"
           size="sm"
@@ -98,6 +108,15 @@ const TaskItem = ({ task, onEdit, onDelete, onToggleComplete }) => {
 };
 
 const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete }) => {
+    // NEW: State for managing the details modal.
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  // NEW: Handler to open the modal with the selected task.
+  const handleViewDetails = (task) => {
+    setSelectedTask(task);
+    setIsDetailsOpen(true);
+  };
   return (
     <SortableContext items={tasks.map(task => task.id)}>
       <div className="space-y-3">
@@ -108,9 +127,18 @@ const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete }) => {
             onEdit={onEdit}
             onDelete={onDelete}
             onToggleComplete={onToggleComplete}
+            onView={handleViewDetails}  // NEW: Pass the view handler.
           />
         ))}
       </div>
+     {/* NEW: Conditionally render the details modal. */}
+      {isDetailsOpen && (
+        <TaskDetailsModal
+          task={selectedTask}
+          onClose={() => setIsDetailsOpen(false)}
+          onEdit={onEdit}  // Reuse the existing onEdit prop.
+        />
+      )}
     </SortableContext>
   );
 };
