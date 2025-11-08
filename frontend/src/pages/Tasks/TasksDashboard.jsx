@@ -102,7 +102,7 @@ export default function TasksDashboard() {
             variant="secondary"
             size="sm"
             icon={dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            onClick={() => toggleDark()}
+            onClick={() => toggleDark()} // FIXED ME
           />
           <Button
             variant="primary"

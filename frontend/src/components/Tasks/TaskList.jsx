@@ -71,7 +71,7 @@ const TaskItem = ({ task, onEdit, onDelete, onToggleComplete, onView }) => {  //
         </Button>
              {/* NEW: Added View Details button before Edit/Delete. */}
         <Button
-          variant="secondary"
+          variant="primary"
           size="sm"
           icon={<Eye className="h-5 w-5" />}
           onClick={() => onView(task)}
