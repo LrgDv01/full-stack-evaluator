@@ -5,18 +5,16 @@ import { useDarkMode } from './hooks/useDarkMode';
 import './styles/App.css';
 
 function App() {
-  const [darkMode] = useDarkMode();
+  const [darkMode] = useDarkMode();  // Read state for any root-level styles
 
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
-        <Router>
-          <Routes>
-            <Route path="/tasks" element={<TasksDashboard />} />
-            <Route path="/" element={<Navigate to="/tasks" replace />} />
-          </Routes>
-        </Router>
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/tasks" element={<TasksDashboard />} />
+          <Route path="/" element={<Navigate to="/tasks" replace />} />
+        </Routes>
+      </Router>
     </div>
   );
 }

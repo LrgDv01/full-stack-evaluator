@@ -1,24 +1,33 @@
 import { useState, useEffect } from 'react';
 
 export function useDarkMode() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
+  const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initial = saved ? saved === 'true' : prefersDark;
-    setDarkMode(initial);
-    if (initial) document.documentElement.classList.add('dark');
-  }, []);
+    if (saved !== null) return saved === 'true';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   useEffect(() => {
+    const root = document.documentElement;
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
-    localStorage.setItem('darkMode', darkMode);
+    localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
 
-  return [darkMode, setDarkMode];
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'darkMode') {
+        setDarkMode(e.newValue === 'true');
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const toggleDark = () => setDarkMode((prev) => !prev);
+
+  return [darkMode, toggleDark];
 }
