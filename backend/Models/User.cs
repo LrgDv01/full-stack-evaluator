@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations; // For data annotations
 
 namespace TaskManager.Models
 {
-   public class User
+    public class User
     {
         public int Id { get; set; }
 

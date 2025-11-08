@@ -11,7 +11,7 @@ using TaskManager.Models.Dtos;
 
 namespace TaskManager.API
 {
-    [Route("api/users")]  
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -21,9 +21,9 @@ namespace TaskManager.API
         {
             _context = context;
         }
-        
+
         public record UserResponse(int Id, string Name, string Email, int TaskCount); // Response DTO without password hash
-    
+
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -31,7 +31,7 @@ namespace TaskManager.API
             var users = await _context.Users
                 .Select(u => new { u.Id, u.Name, u.Email, Tasks = u.Tasks.Count })
                 .ToListAsync(); // Hides hash, adds task count
-            return Ok(users.Select(u => new UserResponse(u.Id, u.Name, u.Email, u.Tasks))); 
+            return Ok(users.Select(u => new UserResponse(u.Id, u.Name, u.Email, u.Tasks)));
         }
 
         [HttpPost]

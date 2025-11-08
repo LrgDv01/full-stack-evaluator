@@ -3,7 +3,7 @@ using TaskManager.Models.Dtos;
 
 namespace TaskManager.Models.Dtos
 {
-  public class UserDto
+    public class UserDto
     {
         [Required, StringLength(100)]
         public string Name { get; set; } = string.Empty;
@@ -12,7 +12,7 @@ namespace TaskManager.Models.Dtos
         public string Email { get; set; } = string.Empty;
 
         [Required, MinLength(8)]
-        public string Password { get; set; } = string.Empty;   
+        public string Password { get; set; } = string.Empty;
 
         public List<TaskItemDto>? Tasks { get; set; }  // Optional: Include tasks if needed
     }

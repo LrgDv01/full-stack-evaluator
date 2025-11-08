@@ -38,7 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("DevCorsPolicy"); // Apply CORS policy
-app.MapControllers(); 
+app.MapControllers();
 
 app.Run();
 
