@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect } from 'react';
 import { Plus, Sun, Moon, Search as SearchIcon } from 'lucide-react';
 import {
@@ -29,7 +31,17 @@ function Tasks() {
   const [users, setUsers] = useState([]); // List of users for dropdown
 
   // Hooks - Data and theme
-  const { tasks, loading, error, createTask, updateTask, deleteTask, toggleTask, updateTaskOrder } = useTaskManagement(); // Stable, no props
+  // const { tasks, loading, error, createTask, updateTask, deleteTask, toggleTask, updateTaskOrder } = useTaskManagement(); // Stable, no props
+  const {
+  tasks,
+  loading,
+  error,
+  create,           // ← renamed
+  update,           // ← renamed
+  remove: deleteTask,     // ← alias for clarity
+  toggle: toggleTask,     // ← alias
+  reorder: updateTaskOrder, // ← alias
+} = useTaskManagement();
   const [darkMode, toggleDarkMode] = useDarkMode();
 
   // Fetch users on mount - Handle errors gracefully
@@ -76,44 +88,44 @@ function Tasks() {
       // TODO: Revert UI or show error
     }
   };
+// Handlers
+const handleCreate = async (data) => {
+  if (!currentUser) {
+    alert('Please select a user first');
+    return;
+  }
+  try {
+    await create(data.title, currentUser.id, data.description);
+    setShowCreateModal(false);
+  } catch (err) {
+    console.error('Create failed:', err);
+    alert(`Create failed: ${err.message || 'Unknown error'}`);
+  }
+};
 
-  const handleCreate = async (data) => {
-    if (!currentUser) {
-      alert('Please select a user first'); // Or use a better UI feedback
-      return;
-    }
-    try {
-      await createTask(data.title, currentUser.id, data.description);
-      setShowCreateModal(false);
-    } catch (err) {
-      console.error('Create failed:', err);
-      alert(`Create failed: ${err.message}`);
-    }
-  };
+const handleUpdate = async (data) => {
+  try {
+    await update(editingTask.id, {
+      ...editingTask,
+      title: data.title,
+      description: data.description,
+    });
+    setEditingTask(null);
+  } catch (err) {
+    console.error('Update failed:', err);
+    alert(`Update failed: ${err.message || 'Unknown error'}`);
+  }
+};
 
-  const handleUpdate = async (data) => {
-    try {
-      await updateTask(editingTask.id, {
-        ...editingTask, // Preserve userId, isDone, order, etc.
-        title: data.title,
-        description: data.description,
-      });
-      setEditingTask(null);
-    } catch (err) {
-      console.error('Update failed:', err);
-      alert(`Update failed: ${err.message}`);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this task?')) return;
-    try {
-      await deleteTask(id);
-    } catch (err) {
-      console.error('Delete failed:', err);
-      alert(`Delete failed: ${err.message}`);
-    }
-  };
+const handleDelete = async (id) => {
+  if (!window.confirm('Delete this task?')) return;
+  try {
+    await deleteTask(id); // ← this now works because of alias
+  } catch (err) {
+    console.error('Delete failed:', err);
+    alert(`Delete failed: ${err.message || 'Unknown error'}`);
+  }
+};
 
   // Render - Handle loading/error first
   if (loading) {
