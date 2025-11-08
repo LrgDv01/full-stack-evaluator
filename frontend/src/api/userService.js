@@ -2,11 +2,11 @@
 import api from './axios';
 
 export const fetchUsers = async () => {
-  const res = await api.get('/api/users');
+  const res = await api.get('/users');
   return res.data;
 };
 
 export const createUser = async (user) => {
-  const res = await api.post('/api/users', user);
+  const res = await api.post('/users', user);
   return res.data;
 };

@@ -1,37 +1,38 @@
 import { useState, useEffect } from 'react';
+import { Plus, Sun, Moon, Search as SearchIcon } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+
 import Button from '../../components/Buttons/Button';
-import UserForm from '../../components/UserForm';
 import Modal from '../../components/modals/modal.jsx';
-import SortableTaskItem from '../../components/Tasks/SortableTaskItem';
+import TaskList from '../../components/Tasks/TaskList'; // Assuming this wraps SortableTaskItem
+import TaskForm from '../../components/Tasks/TaskForm';
+import SearchBar from '../../components/Tasks/SearchBar'; // Or implement as input if missing
+import UserForm from '../../components/UserForm';
 import { useTaskManagement } from '../../hooks/useTaskManagement';
 import { useDarkMode } from '../../hooks/useDarkMode';
-import { Search, Plus, Moon, Sun } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { fetchUsers } from '../../api/userService'; // Add if not there (from earlier)
+import { fetchUsers } from '../../api/userService'; // For fetching users
 
-function Tasks({ tasks: propTasks = [], onRefresh }) {
+function Tasks() {
+  // UI States - Grouped for readability
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [users, setUsers] = useState([]); // For dropdown
-  const [darkMode, setDarkMode] = useDarkMode();
-  
-  const {
-    tasks,
-    loading,
-    error,
-    editingTask,
-    setEditingTask,
-    newTitle,
-    setNewTitle,
-    createTask,
-    updateTask,
-    deleteTask,
-    updateTaskOrder
-  } = useTaskManagement(propTasks, onRefresh);
+  const [editingTask, setEditingTask] = useState(null); // Null or task object for edit modal
+  const [currentUser, setCurrentUser] = useState(null); // Selected user for task creation
+  const [users, setUsers] = useState([]); // List of users for dropdown
 
-  // Fetch users for selection
+  // Hooks - Data and theme
+  const { tasks, loading, error, createTask, updateTask, deleteTask, toggleTask, updateTaskOrder } = useTaskManagement(); // Stable, no props
+  const [darkMode, toggleDarkMode] = useDarkMode();
+
+  // Fetch users on mount - Handle errors gracefully
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -39,20 +40,27 @@ function Tasks({ tasks: propTasks = [], onRefresh }) {
         setUsers(userData);
       } catch (err) {
         console.error('Failed to load users:', err);
+        // TODO: Show user-friendly error (e.g., toast)
       }
     };
     loadUsers();
   }, []);
 
+  // DnD Setup - Sensors for pointer/keyboard
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // Filtered and Sorted Tasks - Memoize if performance issues arise
   const filteredTasks = tasks
-    .filter(task => task.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(task => 
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (task.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .sort((a, b) => a.order - b.order);
 
+  // Handlers - Keep async and error-handled
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -64,152 +72,114 @@ function Tasks({ tasks: propTasks = [], onRefresh }) {
     try {
       await updateTaskOrder(newTasks);
     } catch (err) {
-      alert(`Failed to save order: ${err.message}`);
-      onRefresh?.();
+      console.error('Failed to update order:', err);
+      // TODO: Revert UI or show error
     }
   };
 
-  const handleCreateTask = async (title) => {
+  const handleCreate = async (data) => {
     if (!currentUser) {
-      alert('Please select a user first');
+      alert('Please select a user first'); // Or use a better UI feedback
       return;
     }
     try {
-      await createTask(title, currentUser.id);
+      await createTask(data.title, currentUser.id, data.description);
       setShowCreateModal(false);
     } catch (err) {
+      console.error('Create failed:', err);
       alert(`Create failed: ${err.message}`);
     }
   };
 
-  const handleDeleteTask = async (id) => {
+  const handleUpdate = async (data) => {
+    try {
+      await updateTask(editingTask.id, {
+        ...editingTask, // Preserve userId, isDone, order, etc.
+        title: data.title,
+        description: data.description,
+      });
+      setEditingTask(null);
+    } catch (err) {
+      console.error('Update failed:', err);
+      alert(`Update failed: ${err.message}`);
+    }
+  };
+
+  const handleDelete = async (id) => {
     if (!window.confirm('Delete this task?')) return;
     try {
       await deleteTask(id);
     } catch (err) {
+      console.error('Delete failed:', err);
       alert(`Delete failed: ${err.message}`);
     }
   };
 
-  if (loading) return <div className="text-center py-10 flex justify-center"><Loader2 className="animate-spin h-8 w-8" /></div>;
-  if (error) return <div className="text-red-600 text-center p-4 bg-red-50 rounded">{error}</div>;
+  // Render - Handle loading/error first
+  if (loading) {
+    return <div className="flex justify-center py-12"><div className="animate-spin h-10 w-10 border-t-4 border-indigo-600 rounded-full" /></div>;
+  }
+  if (error) {
+    return <div className="text-red-600 text-center p-4 bg-red-50 rounded">{error}</div>;
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="max-w-4xl mx-auto p-6">
-        {/* Header - Responsive flex */}
+        {/* Header - Flexible for responsiveness */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Task Manager
-          </h1>
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search tasks..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 transition-shadow ${
-                  darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300'
-                }`}
-              />
-            </div>
-            <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Task Manager</h1>
+          <div className="flex items-center gap-4">
+            <Button icon={darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />} onClick={toggleDarkMode} />
+            <Button label={<><Plus className="inline h-5 w-5 mr-1" /> Add Task</>} onClick={() => setShowCreateModal(true)} />
           </div>
         </div>
 
-        {/* User Controls - Modern card style */}
-        <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md transition-shadow hover:shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4">User Management</h2>
+        {/* User Management - Card for visual separation */}
+        <div className={`mb-8 p-6 rounded-xl shadow-md transition-shadow ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <h2 className="text-2xl font-semibold mb-4">Select User</h2>
           <select
             value={currentUser?.id || ''}
             onChange={(e) => setCurrentUser(users.find(u => u.id === Number(e.target.value)) || null)}
-            className={`w-full p-2 border rounded-lg mb-4 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'}`}
+            className={`w-full p-2 border rounded-lg mb-4 ${darkMode ? 'bg-gray-700 border-gray-700' : 'bg-white border-gray-300'}`}
           >
             <option value="">Select User</option>
             {users.map(user => <option key={user.id} value={user.id}>{user.email}</option>)}
           </select>
-          <UserForm onSuccess={(user) => {
-            setUsers([...users, user]);
-            setCurrentUser(user);
-            onRefresh?.();
+          <UserForm onSuccess={(newUser) => {
+            setUsers(prev => [...prev, newUser]);
+            setCurrentUser(newUser);
           }} />
         </div>
 
-        {/* Task Controls */}
-        <div className="flex justify-end mb-4">
-          <Button
-            label={<><Plus className="inline h-5 w-5 mr-1" /> Add Task</>}
-            onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all"
-          />
-        </div>
+        {/* Search */}
+        <SearchBar value={searchTerm} onChange={setSearchTerm} onClear={() => setSearchTerm('')} />
 
         {/* Task List */}
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={filteredTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-4">
-              {filteredTasks.length === 0 ? (
-                <p className="text-center py-8 text-gray-500 dark:text-gray-400 italic">No tasks yet. Create one!</p>
-              ) : (
-                filteredTasks.map((task) => (
-                  <SortableTaskItem
-                    key={task.id}
-                    task={task}
-                    darkMode={darkMode}
-                    onToggle={(t) => updateTask(t, { isDone: !t.isDone })}
-                    onEdit={(t) => { setEditingTask(t); setNewTitle(t.title); }}
-                    onDelete={handleDeleteTask}
-                    isEditing={editingTask?.id === task.id}
-                    newTitle={newTitle}
-                    setNewTitle={setNewTitle}
-                    onSaveEdit={(e) => {
-                      e.preventDefault();
-                      updateTask(task, { title: newTitle });
-                      setEditingTask(null);
-                    }}
-                    onCancelEdit={() => setEditingTask(null)}
-                  />
-                ))
-              )}
-            </div>
-          </SortableContext>
+          <TaskList
+            tasks={filteredTasks}
+            darkMode={darkMode}
+            onEdit={setEditingTask}
+            onDelete={handleDelete}
+            onToggle={toggleTask}
+          />
         </DndContext>
 
-        {/* Create Modal - Improved UX with conditional warning */}
+        {/* Create Modal */}
         {showCreateModal && (
           <Modal onClose={() => setShowCreateModal(false)}>
-            <div className={darkMode ? 'text-white' : 'text-gray-900'}>
-              <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
-              {!currentUser && (
-                <div className="mb-4 p-3 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 rounded-lg flex items-center">
-                  <AlertCircle className="h-5 w-5 mr-2" />
-                  Please select a user first
-                </div>
-              )}
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const title = e.target.title.value;
-                if (title.trim()) handleCreateTask(title);
-              }} className="space-y-4">
-                <input
-                  name="title"
-                  type="text"
-                  placeholder="Enter task title..."
-                  required
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                    darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300'
-                  }`}
-                />
-                <div className="flex justify-end gap-2">
-                  <Button type="button" label="Cancel" onClick={() => setShowCreateModal(false)} className={darkMode ? 'bg-gray-700' : 'bg-gray-200'} />
-                  <Button type="submit" label="Create" disabled={!currentUser} className="bg-indigo-600 text-white disabled:opacity-50" />
-                </div>
-              </form>
-            </div>
+            <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
+            {!currentUser && <p className="mb-4 text-yellow-600">Please select a user first.</p>}
+            <TaskForm onSubmit={handleCreate} onCancel={() => setShowCreateModal(false)} disabled={!currentUser} />
+          </Modal>
+        )}
+
+        {/* Edit Modal */}
+        {editingTask && (
+          <Modal onClose={() => setEditingTask(null)}>
+            <h2 className="text-2xl font-bold mb-4">Edit Task</h2>
+            <TaskForm task={editingTask} onSubmit={handleUpdate} onCancel={() => setEditingTask(null)} />
           </Modal>
         )}
       </div>
