@@ -20,34 +20,26 @@ public class TasksController : ControllerBase
         _log = log;
     }
 
-    // ---------- GET ----------
+    // GET: Fetch tasks, optionally filtered by userId, ordered by Order field
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskResponse>>> Get([FromQuery] int? userId = null)
     {
-        _log.LogInformation("GET tasks – userId: {UserId}", userId);
+        _log.LogInformation("Fetching tasks for userId: {UserId}", userId);
 
-        IQueryable<TaskItem> query = _db.Tasks;
+        var query = _db.Tasks.AsNoTracking(); // Optimize for read-only
 
         if (userId.HasValue)
             query = query.Where(t => t.UserId == userId.Value);
 
         var result = await query
             .OrderBy(t => t.Order)
-            .Select(t => new TaskResponse(
-                t.Id,
-                t.Title,
-                t.Description,
-                t.IsCompleted,
-                t.Order,
-                t.UserId,
-                t.CreatedAt,
-                t.UpdatedAt))
+            .Select(t => MapToResponse(t))
             .ToListAsync();
 
         return Ok(result);
     }
 
-    // ---------- POST ----------
+    // POST: Create a new task
     [HttpPost]
     public async Task<ActionResult<TaskResponse>> Create([FromBody] TaskItemDto dto)
     {
@@ -63,14 +55,14 @@ public class TasksController : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = entity.Id }, MapToResponse(entity));
     }
 
-    // ---------- PUT ----------
+    // PUT: Update an existing task
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] TaskItemDto dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var entity = await _db.Tasks.FindAsync(id);
-        if (entity is null) return NotFound();
+        if (entity == null) return NotFound();
 
         if (entity.UserId != dto.UserId && !await _db.Users.AnyAsync(u => u.Id == dto.UserId))
             return BadRequest($"User {dto.UserId} does not exist.");
@@ -82,19 +74,19 @@ public class TasksController : ControllerBase
         return NoContent();
     }
 
-    // ---------- DELETE ----------
+    // DELETE: Remove a task
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var entity = await _db.Tasks.FindAsync(id);
-        if (entity is null) return NotFound();
+        if (entity == null) return NotFound();
 
         _db.Tasks.Remove(entity);
         await _db.SaveChangesAsync();
         return NoContent();
     }
 
-    // ---------- PATCH reorder ----------
+    // PATCH: Reorder tasks
     [HttpPatch("reorder")]
     public async Task<IActionResult> Reorder([FromBody] IReadOnlyList<TaskOrderUpdateDto> updates)
     {
@@ -103,21 +95,24 @@ public class TasksController : ControllerBase
 
         foreach (var task in tasks)
         {
-            var upd = updates.First(u => u.Id == task.Id);
-            task.Order = upd.Order;
-            task.UpdatedAt = DateTime.UtcNow;
+            var upd = updates.FirstOrDefault(u => u.Id == task.Id);
+            if (upd != null)
+            {
+                task.Order = upd.Order;
+                task.UpdatedAt = DateTime.UtcNow;
+            }
         }
 
         await _db.SaveChangesAsync();
         return NoContent();
     }
 
-    // ---------- PATCH toggle ----------
+    // PATCH: Toggle task completion
     [HttpPatch("{id:int}/toggle")]
     public async Task<ActionResult<TaskResponse>> Toggle(int id, [FromBody] bool isCompleted)
     {
         var task = await _db.Tasks.FindAsync(id);
-        if (task is null) return NotFound();
+        if (task == null) return NotFound();
 
         task.IsCompleted = isCompleted;
         task.UpdatedAt = DateTime.UtcNow;
@@ -126,20 +121,7 @@ public class TasksController : ControllerBase
         return Ok(MapToResponse(task));
     }
 
-    // ----- mapping helpers -----
-
-    // private static TaskItem MapToEntity(TaskItemDto dto, TaskItem? target = null)
-    // {
-    //     target ??= new TaskItem();
-
-    //     target.Title       = dto.Title;
-    //     target.Description = dto.Description;
-    //     target.IsCompleted = dto.IsCompleted;
-    //     target.UserId      = dto.UserId;
-    //     target.Order       = dto.Order;
-
-    //     return target;
-    // }
+    // Mapping Helpers 
     private static TaskItem MapToEntity(TaskItemDto dto, TaskItem? target = null)
     {
         if (target is null)
