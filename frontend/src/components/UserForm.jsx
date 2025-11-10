@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import api from '../api/axios';
+
 import Button from './Buttons/Button';
 
 // Helper component for inputs (keeps main form clean)
-const InputField = ({ label, type = 'text', name, value, onChange, error, required = true }) => (
+const InputField = ({ isDarkmode, label, type = 'text', name, value, onChange, error, required = true }) => (
+
   <div className="mb-4 transition-all duration-200 ease-in-out">
-    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+    <label className="block text-md font-medium  mb-2 ms-2 text-start">
       {label}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && <span className="text-red-500 ml-2">*</span>}
     </label>
     <input
       type={type}
       name={name}
       value={value}
       onChange={onChange}
-      className={`w-full p-2.5 border rounded-lg transition-all duration-200
-        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-md
-        dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400
-        ${error ? 'border-red-500 bg-red-50 dark:bg-red-900/20 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'}
-      `}
+      className={`w-full p-2.5 border rounded-lg transition-all duration-200 bg-gray-500 focus:ring-2 focus:ring-blue-500
+         focus:border-blue-500 focus:shadow-md dark:border-gray-600  dark:placeholder-gray-400  
+          ${isDarkmode ? 'bg-gray-600 dark:bg-gray-600 border-gray-500 text-gray-300 dark:text-gray-300' 
+            : 'bg-gray-300 dark:bg-gray-300 border-gray-300 text-gray-700 dark:text-gray-700'}
+          ${error ? 'border-red-500 bg-red-50 dark:bg-red-900/20 dark:border-red-600' 
+            : 'border-gray-300 dark:border-gray-600'}
+        `}
       required={required}
       aria-invalid={!!error}
       aria-describedby={error ? `${name}-error` : undefined}
@@ -33,12 +37,12 @@ const InputField = ({ label, type = 'text', name, value, onChange, error, requir
   </div>
 );
 
-const UserForm = ({ userId = null, onSuccess, initialData = null }) => {
+const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [validationErrors, setValidationErrors] = useState({});
   const [apiError, setApiError] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  
   useEffect(() => {
     if (initialData) {
       setFormData({ ...initialData, password: '' }); // Don't pre-fill password for security
@@ -92,18 +96,18 @@ const UserForm = ({ userId = null, onSuccess, initialData = null }) => {
   return (
     <form 
       onSubmit={handleSubmit} 
-      className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg animate-fade-in-up"
+      className={`p-6 bg-transparent  border-none rounded-xl  animate-fade-in-up`}
     >
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+      <h2 className="text-2xl font-bold mb-6">
         {userId ? 'Update User' : 'Create User'}
       </h2>
       
-      <InputField label="Name" name="name" value={formData.name} onChange={handleChange} error={validationErrors.name} />
-      <InputField label="Email" type="email" name="email" value={formData.email} onChange={handleChange} error={validationErrors.email} />
-      <InputField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} error={validationErrors.password} required={!userId} />
+      <InputField isDarkmode={isDarkmode} label="Name" name="name" value={formData.name} onChange={handleChange} error={validationErrors.name} />
+      <InputField isDarkmode={isDarkmode} label="Email" type="email" name="email" value={formData.email} onChange={handleChange} error={validationErrors.email} />
+      <InputField isDarkmode={isDarkmode} label="Password" type="password" name="password" value={formData.password} onChange={handleChange} error={validationErrors.password} required={!userId} />
 
       {apiError && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg animate-fade-in">
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 rounded-lg animate-fade-in">
           <p className="text-sm text-red-600 dark:text-red-400 flex items-center">
             <AlertCircle className="w-4 h-4 mr-2" />
             {apiError}

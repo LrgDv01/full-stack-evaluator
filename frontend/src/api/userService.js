@@ -1,4 +1,3 @@
-// frontend/src/api/userService.js
 import api from './axios';
 
 export const fetchUsers = async () => {

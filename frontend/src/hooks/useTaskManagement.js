@@ -17,7 +17,9 @@ export function useTaskManagement() {
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 500); // delay for 0.5 second (500 ms)
     }
   }, []);
 
