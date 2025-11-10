@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import api from '../api/axios';
 
-import Button from './Buttons/Button';
+import Button from './buttons/Button';
 
 // Helper component for inputs (keeps main form clean)
 const InputField = ({ isDarkmode, label, type = 'text', name, value, onChange, error, required = true }) => (
