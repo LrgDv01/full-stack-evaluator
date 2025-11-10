@@ -1,21 +1,35 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-// import TasksDashboard from './pages/Tasks/TasksDashboard';
-import Tasks from './pages/Tasks/Tasks';
+import Layout from './components/layouts/Layout';
 import { useDarkMode } from './hooks/useDarkMode';
 import './styles/App.css';
 
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Users = lazy(() => import('./pages/Users'));
+const Tasks = lazy(() => import('./pages/Tasks'));
+
 function App() {
-  const [darkMode] = useDarkMode();  // Read state for any root-level styles
+  const [darkMode] = useDarkMode();
 
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
       <Router>
-        <Routes>
-          <Route path="/tasks" element={<Tasks />} />
-          {/* <Route path="/tasks" element={<TasksDashboard />} /> */}
-          <Route path="/" element={<Navigate to="/tasks" replace />} />
-        </Routes>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center h-screen">
+              <div className="animate-spin h-12 w-12 border-t-4 border-indigo-600 rounded-full" />
+            </div>
+          }
+        >
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </Router>
     </div>
   );
