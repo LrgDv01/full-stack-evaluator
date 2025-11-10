@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Check, Trash2, Edit2, Undo, Eye } from 'lucide-react';
-import Button from '../Buttons/Button';
-import DeleteConfirmationModal from '../Modals/DeleteConfirmationModal';
-import TaskDetailsModal from '../Modals/TaskDetailsModal';
+import Button from '../buttons/Button';
+import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
+import TaskDetailsModal from '../modals/TaskDetailsModal';
 
 /* -------------------------------------------------
    TaskItem – unchanged except for the prop name
@@ -40,7 +40,7 @@ const TaskItem = ({
       style={style}
       className={`group flex items-center gap-3 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all 
            ${ task.isCompleted ? (isDarkMode ? 'bg-gray-700 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700' 
-                : 'bg-gray-500 dark:bg-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600') 
+                : 'bg-gray-300 dark:bg-gray-300 hover:bg-gray-400 dark:hover:bg-gray-400') 
               : (isDarkMode ? 'bg-gray-400 dark:bg-gray-400 hover:bg-gray-300 dark:hover:bg-gray-300 ' 
                 : 'bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-700') }`}
     >
@@ -51,7 +51,7 @@ const TaskItem = ({
         className={`border-none touch-none 
                 
          ${ task.isCompleted ? (isDarkMode ? ' dark:bg-gray-800 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-100' 
-              : 'bg-gray-200 dark:hover:bg-gray-500 dark:hover:text-gray-200') 
+              : 'bg-gray-100 dark:hover:bg-gray-500 dark:hover:text-gray-200') 
             : (isDarkMode ? ' dark:bg-gray-700 dark:hover:bg-gray-500 text-gray-300 hover:text-gray-200' 
               : 'bg-gray-200 dark:hover:bg-gray-500 dark:hover:text-gray-200') }` }
       >
@@ -63,7 +63,7 @@ const TaskItem = ({
         <h3 
           className={`text-sm font-bold  
             ${task.isCompleted ? ( isDarkMode ? 'line-through text-gray-400 dark:text-gray-400' 
-                : 'line-through text-gray-300 dark:text-gray-300')
+                : 'line-through text-gray-600 dark:text-gray-600')
               : ( isDarkMode ? ' text-gray-700 dark:text-gray-700' 
                 : ' text-gray-400 dark:text-gray-200')}`}
         >
@@ -71,7 +71,7 @@ const TaskItem = ({
         </h3>
         {task.description && (
           <p className={`mt-1 ps-2 text-sm truncate 
-          ${task.isCompleted ? (isDarkMode ? 'text-gray-400 dark:text-gray-400' : 'text-gray-300 dark:text-gray-300') 
+          ${task.isCompleted ? (isDarkMode ? 'text-gray-400 dark:text-gray-400' : 'text-gray-600 dark:text-gray-600') 
             : (isDarkMode ? 'text-gray-700 dark:text-gray-700' : 'text-gray-200 dark:text-gray-200')}`}>
             {task.description}
           </p>
@@ -122,6 +122,7 @@ const TaskItem = ({
       {/* Delete confirmation modal */}
       {showDeleteModal && (
         <DeleteConfirmationModal
+          isDarkmode={isDarkMode}
           title={task.title}
           onConfirm={() => {
             onDelete(task.id);
@@ -161,6 +162,7 @@ const TaskList = ({ isDarkmode, tasks, onEdit, onDelete, onToggle }) => {
       </div>
       {isDetailsOpen && (
         <TaskDetailsModal
+          isDarkMode={isDarkmode}
           task={selectedTask}
           onClose={() => setIsDetailsOpen(false)}
           onEdit={onEdit}

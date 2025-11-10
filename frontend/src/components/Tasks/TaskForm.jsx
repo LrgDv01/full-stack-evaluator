@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import Button from '../Buttons/Button';
+import Button from '../buttons/Button';
 
 const TaskForm = ({ task = null, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({ title: '', description: '' });

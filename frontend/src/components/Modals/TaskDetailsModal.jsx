@@ -1,14 +1,14 @@
 import React from 'react';
 import { AlignLeft, Calendar, Check, User } from 'lucide-react';
-import Modal from '../modals/modal';
-import Button from '../Buttons/Button';
+import Modal from './modal';
+import Button from '../buttons/Button';
 
-const TaskDetailsModal = ({ task, onClose, onEdit }) => {
+const TaskDetailsModal = ({ isDarkMode, task, onClose, onEdit }) => {
   if (!task) return null;
 
   return (
-    <Modal title="Task Details" onClose={onClose}>
-      <div className="p-6 space-y-6">
+    <Modal isDarkMode={isDarkMode} title="Task Details" onClose={onClose}>
+      <div className="p-6 space-y-6"> 
         {/* Title and Status */}
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center justify-between">

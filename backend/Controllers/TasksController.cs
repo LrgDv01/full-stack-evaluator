@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using TaskManager.Data;
+using Microsoft.Extensions.Logging; // use logging to log data for debugging purposes
+using TaskManager.Data;      
 using TaskManager.Models;
 using TaskManager.Models.Dtos;
 

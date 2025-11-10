@@ -1,14 +1,14 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
-import Modal from '../modals/modal';
-import Button from '../Buttons/Button';
+import Modal from './modal';
+import Button from '../buttons/Button';
 
-const DeleteConfirmationModal = ({ title, onConfirm, onCancel }) => {
+const DeleteConfirmationModal = ({ isDarkmode, title, onConfirm, onCancel }) => {
   return (
-    <Modal onClose={onCancel}>
+    <Modal isDarkMode={isDarkmode} onClose={onCancel}>
       <div className="p-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-200 flex items-center justify-center">
             <AlertTriangle className="h-6 w-6 text-red-600" />
           </div>
           <div>

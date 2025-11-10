@@ -10,7 +10,7 @@ export default function Button({
   className = '',
   icon = null
 }) {
-  const baseStyles = 'font-bold rounded-1 transition-all duration-200 flex items-center justify-center gap-2';
+  const baseStyles = 'font-bold rounded-3xl transition-all duration-200 flex items-center justify-center gap-2';
   
   const variants = {
     primary: 'bg-blue-500 text-white hover:bg-blue-700 disabled:bg-blue-300',
