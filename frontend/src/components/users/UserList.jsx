@@ -10,6 +10,13 @@ export default function UserList({ onUserSelect, darkMode }) {
 
   return (
     <div className="space-y-6">
+           {/* <UserForm isDarkmode ={darkMode} 
+            onSuccess={(newUser) => {
+              addUser(newUser);
+              setCurrentUser(newUser);
+            }} 
+          /> */}
+  
       <UserForm
         onSuccess={(newUser) => {
           addUser(newUser);
