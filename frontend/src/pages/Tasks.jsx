@@ -146,30 +146,13 @@ const handleDelete = async (id) => {
             <Button isDarkmode={darkMode} type={'toggle'} icon={darkMode ?  <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />} onClick={toggleDarkMode} />           
           </div>
       </div>
-      <div className="flex flex-row justify-center mx-auto p-6">
+      <div className="mx-auto p-6">
         {/* Header - Flexible for responsiveness */}
         {/* User Management - Card for visual separation */}
-        <div className={`w-1/3 mb-8 p-6 rounded-xl shadow-md transition-shadow ${darkMode ? 'bg-gray-800 dark:bg-gray-800' : 'bg-gray-400 dark:bg-gray-400'}`}>
-          <h2 className="text-2xl font-semibold mb-4">Select User</h2>
-          <select
-            value={currentUser?.id || ''}
-            onChange={(e) => setCurrentUser(users.find(u => u.id === Number(e.target.value)) || null)}
-            className={`w-full p-2 border rounded-2xl mb-4 ${darkMode ? 'bg-gray-600 border-gray-600' : 'bg-gray-300 dark:bg-gray-300 border-gray-400'}`}
-          >
-            <option value="">Select User</option>
-            {users.map(user => <option key={user.id} value={user.id}>{user.email}</option>)}
-          </select>
-          <UserForm isDarkmode ={darkMode} 
-            onSuccess={(newUser) => {
-              addUser(newUser);
-              setCurrentUser(newUser);
-            }} 
-          />
-           {/* setUsers(prev => [...prev, newUser]); */}
-        </div>
-
+        
+     
         {/* Search */}
-        <div className="flex-1 max-w-3xl ml-8">
+        <div className="px-2">
           <div className="mb-3 flex justify-between items-center">
             <SearchBar isDarkmode={darkMode} value={searchTerm} onChange={setSearchTerm} onClear={() => setSearchTerm('')} />
             <Button  isDarkmode={darkMode} label={<><Plus className="h-5 w-5 mr-1"/> Add Task</>} onClick={() => setShowCreateModal(true)} /> 
@@ -190,6 +173,15 @@ const handleDelete = async (id) => {
             <Modal isDarkMode={darkMode} onClose={() => setShowCreateModal(false)}>
               <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
               {!currentUser && <p className="mb-4 text-yellow-600">Please select a user first.</p>}
+               <h2 className="text-2xl font-semibold mb-4">Select User</h2>
+                <select
+                  value={currentUser?.id || ''}
+                  onChange={(e) => setCurrentUser(users.find(u => u.id === Number(e.target.value)) || null)}
+                  className={`w-full p-2 border rounded-2xl mb-4 ${darkMode ? 'bg-gray-600 border-gray-600' : 'bg-gray-300 dark:bg-gray-300 border-gray-400'}`}
+                >
+                  <option value="">Select User</option>
+                  {users.map(user => <option key={user.id} value={user.id}>{user.email}</option>)}
+                </select>
               <TaskForm onSubmit={handleCreate} onCancel={() => setShowCreateModal(false)} disabled={!currentUser} />
             </Modal>
           )}
