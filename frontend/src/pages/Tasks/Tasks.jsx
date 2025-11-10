@@ -1,7 +1,7 @@
 
 
 import { useState, useEffect } from 'react';
-import { Plus, Sun, Moon, Search as SearchIcon } from 'lucide-react';
+import { Plus, Sun, Moon, ListTodoIcon } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -33,15 +33,15 @@ function Tasks() {
   // Hooks - Data and theme
   // const { tasks, loading, error, createTask, updateTask, deleteTask, toggleTask, updateTaskOrder } = useTaskManagement(); // Stable, no props
   const {
-  tasks,
-  loading,
-  error,
-  create,           // ← renamed
-  update,           // ← renamed
-  remove: deleteTask,     // ← alias for clarity
-  toggle: toggleTask,     // ← alias
-  reorder: updateTaskOrder, // ← alias
-} = useTaskManagement();
+    tasks,
+    loading,
+    error,
+    create,           // ← renamed
+    update,           // ← renamed
+    remove: deleteTask,     // ← alias for clarity
+    toggle: toggleTask,     // ← alias
+    reorder: updateTaskOrder, // ← alias
+  } = useTaskManagement();
   const [darkMode, toggleDarkMode] = useDarkMode();
 
   // Fetch users on mount - Handle errors gracefully
@@ -137,63 +137,66 @@ const handleDelete = async (id) => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="max-w-4xl mx-auto p-6">
-        {/* Header - Flexible for responsiveness */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Task Manager</h1>
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 p-6 max-w-1xl mx-auto">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex pb-3">
+            <ListTodoIcon className="h-8 w-8 text-indigo-600 me-3"/> Task Manager</h1>
           <div className="flex items-center gap-4">
-            <Button icon={darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />} onClick={toggleDarkMode} />
-            <Button label={<><Plus className="inline h-5 w-5 mr-1" /> Add Task</>} onClick={() => setShowCreateModal(true)} />
+            <Button isDarkmode={darkMode} type={'toggle'} icon={darkMode ?  <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />} onClick={toggleDarkMode} />           
           </div>
-        </div>
-
+      </div>
+      <div className="flex flex-row justify-center mx-auto p-6">
+        {/* Header - Flexible for responsiveness */}
         {/* User Management - Card for visual separation */}
-        <div className={`mb-8 p-6 rounded-xl shadow-md transition-shadow ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className={`w-1/3 mb-8 p-6 rounded-xl shadow-md transition-shadow ${darkMode ? 'bg-gray-800 dark:bg-gray-800' : 'bg-gray-400 dark:bg-gray-400'}`}>
           <h2 className="text-2xl font-semibold mb-4">Select User</h2>
           <select
             value={currentUser?.id || ''}
             onChange={(e) => setCurrentUser(users.find(u => u.id === Number(e.target.value)) || null)}
-            className={`w-full p-2 border rounded-lg mb-4 ${darkMode ? 'bg-gray-700 border-gray-700' : 'bg-white border-gray-300'}`}
+            className={`w-full p-2 border rounded-lg mb-4 ${darkMode ? 'bg-gray-600 border-gray-600' : 'bg-gray-300 dark:bg-gray-300 border-gray-400'}`}
           >
             <option value="">Select User</option>
             {users.map(user => <option key={user.id} value={user.id}>{user.email}</option>)}
           </select>
-          <UserForm onSuccess={(newUser) => {
+          <UserForm isDarkmode ={darkMode} onSuccess={(newUser) => {
             setUsers(prev => [...prev, newUser]);
             setCurrentUser(newUser);
           }} />
         </div>
 
         {/* Search */}
-        <SearchBar value={searchTerm} onChange={setSearchTerm} onClear={() => setSearchTerm('')} />
+        <div className="flex-1 max-w-3xl ml-8">
+          <div className="mb-3 flex justify-between items-center">
+            <SearchBar isDarkmode={darkMode} value={searchTerm} onChange={setSearchTerm} onClear={() => setSearchTerm('')} />
+            <Button  isDarkmode={darkMode} label={<><Plus className="h-5 w-5 mr-1"/> Add Task</>} onClick={() => setShowCreateModal(true)} /> 
+          </div>
+          {/* Task List */}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <TaskList
+              isDarkmode={darkMode}
+              tasks={filteredTasks}
+              onEdit={setEditingTask}
+              onDelete={handleDelete}
+              onToggle={toggleTask}
+            />
+          </DndContext>
 
-        {/* Task List */}
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <TaskList
-            tasks={filteredTasks}
-            darkMode={darkMode}
-            onEdit={setEditingTask}
-            onDelete={handleDelete}
-            onToggle={toggleTask}
-          />
-        </DndContext>
+          {/* Create Modal */}
+          {showCreateModal && (
+            <Modal onClose={() => setShowCreateModal(false)}>
+              <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
+              {!currentUser && <p className="mb-4 text-yellow-600">Please select a user first.</p>}
+              <TaskForm onSubmit={handleCreate} onCancel={() => setShowCreateModal(false)} disabled={!currentUser} />
+            </Modal>
+          )}
 
-        {/* Create Modal */}
-        {showCreateModal && (
-          <Modal onClose={() => setShowCreateModal(false)}>
-            <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
-            {!currentUser && <p className="mb-4 text-yellow-600">Please select a user first.</p>}
-            <TaskForm onSubmit={handleCreate} onCancel={() => setShowCreateModal(false)} disabled={!currentUser} />
-          </Modal>
-        )}
-
-        {/* Edit Modal */}
-        {editingTask && (
-          <Modal onClose={() => setEditingTask(null)}>
-            <h2 className="text-2xl font-bold mb-4">Edit Task</h2>
-            <TaskForm task={editingTask} onSubmit={handleUpdate} onCancel={() => setEditingTask(null)} />
-          </Modal>
-        )}
+          {/* Edit Modal */}
+          {editingTask && (
+            <Modal onClose={() => setEditingTask(null)}>
+              <h2 className="text-2xl font-bold mb-4">Edit Task</h2>
+              <TaskForm task={editingTask} onSubmit={handleUpdate} onCancel={() => setEditingTask(null)} />
+            </Modal>
+          )}
+        </div>
       </div>
     </div>
   );
