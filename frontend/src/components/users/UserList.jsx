@@ -1,14 +1,19 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Edit, Trash2, UserCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import UserForm from './UserForm';
 import { useUsers } from '../../hooks/useUsers';
 import Button from '../buttons/Button';
+import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
+import SearchBar from '../tasks/SearchBar';
+import { toast } from 'react-hot-toast'; // Add react-hot-toast
 
 export default function UserList({ darkMode }) {
-  const { users, loading, error, addUser } = useUsers();
+  const { users, loading, error, addUser, setUsers } = useUsers();
   const [showForm, setShowForm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [deleteUserId, setDeleteUserId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const openForm = (user = null) => {
     setSelectedUser(user);
@@ -20,25 +25,64 @@ export default function UserList({ darkMode }) {
     setSelectedUser(null);
   };
 
-  const handleSuccess = (newUser) => {
-    addUser(newUser);
+  const handleSuccess = (updatedUser) => {
+    if (selectedUser) {
+      // Update existing user
+      setUsers((prev) =>
+        prev.map((u) => (u.id === updatedUser.id ? { ...u, ...updatedUser } : u))
+      );
+      toast.success('User updated successfully');
+    } else {
+      addUser(updatedUser);
+      toast.success('User created successfully');
+    }
     closeForm();
   };
+
+  const handleDelete = async (id) => {
+    const originalUsers = [...users];
+    setUsers(users.filter((u) => u.id !== id)); // Optimistic UI
+    toast.promise(
+      api.delete(`/users/${id}`),
+      {
+        loading: 'Deleting user...',
+        success: 'User deleted successfully',
+        error: 'Failed to delete user',
+      }
+    ).catch(() => setUsers(originalUsers)); // Revert on failure
+  };
+
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm) return users;
+    return users.filter(
+      (u) =>
+        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm, users]);
 
   if (loading) return <p className="text-center py-8">Loading users…</p>;
   if (error) return <p className="text-red-600 text-center">{error}</p>;
 
   return (
-    <div className="relative space-y-6">
+    <div className="relative space-y-6 mx-6 p-3">
       {/* Header Section */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">User Management</h2>
-        <Button
-          label="Add User"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => openForm()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white"
-        />
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div className="flex flex-row justify-between items-center gap-3 w-full">
+          <SearchBar
+            isDarkmode={darkMode}
+            value={searchTerm}
+            onChange={setSearchTerm}
+            onClear={() => setSearchTerm('')}
+          />
+
+          <Button
+            label="Add User"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => openForm()}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          />
+        </div>
       </div>
 
       {/* User Table */}
@@ -56,27 +100,25 @@ export default function UserList({ darkMode }) {
             <tr>
               <th className="px-6 py-3">ID</th>
               <th className="px-6 py-3">Name</th>
-              <th className="px-6 py-3">Username</th>
               <th className="px-6 py-3">Email</th>
               <th className="px-6 py-3 text-center">Total Tasks</th>
               <th className="px-6 py-3 text-center">Actions</th>
             </tr>
           </thead>
-
           <tbody>
-            {users.length === 0 ? (
+            {filteredUsers.length === 0 ? (
               <tr>
                 <td
-                  colSpan="6"
+                  colSpan="5"
                   className="text-center py-8 text-gray-500 dark:text-gray-400"
                 >
                   No users found.
                 </td>
               </tr>
             ) : (
-              users.map((u, index) => (
+              filteredUsers.map((u) => (
                 <tr
-                  key={u.id || index}
+                  key={u.id}
                   className={`transition-colors text-start ${
                     darkMode
                       ? 'hover:bg-gray-700 text-gray-200'
@@ -88,10 +130,8 @@ export default function UserList({ darkMode }) {
                     <UserCircle2 className="w-5 h-5 text-indigo-500" />
                     {u.name || '—'}
                   </td>
-                  <td className="px-6 py-3">{u.name || '—'}</td>
                   <td className="px-6 py-3">{u.email}</td>
                   <td className="px-6 py-3 text-center">{u.taskCount || 0}</td>
-                  {console.log('USERLIST : ', u)}
                   <td className="px-6 py-3 flex justify-center gap-3">
                     <button
                       onClick={() => openForm(u)}
@@ -100,7 +140,7 @@ export default function UserList({ darkMode }) {
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => console.log('delete', u.id)}
+                      onClick={() => setDeleteUserId(u.id)}
                       className="p-2 rounded hover:bg-red-500/20 text-red-500 transition"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -113,7 +153,7 @@ export default function UserList({ darkMode }) {
         </table>
       </div>
 
-      {/* Modal Form */}
+      {/* Edit/Create Modal */}
       <AnimatePresence>
         {showForm && (
           <>
@@ -125,7 +165,7 @@ export default function UserList({ darkMode }) {
               exit={{ opacity: 0 }}
             />
             <motion.div
-              className={`fixed inset-0 flex items-center justify-center z-50 p-4`}
+              className="fixed inset-0 flex items-center justify-center z-50 p-4"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
@@ -158,6 +198,19 @@ export default function UserList({ darkMode }) {
           </>
         )}
       </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      {deleteUserId && (
+        <DeleteConfirmationModal
+          isDarkmode={darkMode}
+          title="User"
+          onConfirm={() => {
+            handleDelete(deleteUserId);
+            setDeleteUserId(null);
+          }}
+          onCancel={() => setDeleteUserId(null)}
+        />
+      )}
     </div>
   );
 }

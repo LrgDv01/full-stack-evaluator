@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchUsers } from '../api/userService';
+import api from '../api/axios';
 
 export const useUsers = () => {
   const [users, setUsers] = useState([]);
@@ -22,5 +23,5 @@ export const useUsers = () => {
 
   const addUser = (newUser) => setUsers((prev) => [...prev, newUser]);
 
-  return { users, loading, error, addUser };
+  return { users, loading, error, addUser, setUsers };
 };
