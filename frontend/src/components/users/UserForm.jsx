@@ -3,16 +3,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import api from '../../api/axios';
 import Button from '../buttons/Button';
 
-const InputField = ({
-  isDarkmode,
-  label,
-  type = 'text',
-  name,
-  value,
-  onChange,
-  error,
-  required = true,
-}) => (
+const InputField = ({ isDarkmode, label, type = 'text', name, value, onChange, error, required = true }) => (
   <div className="mb-4">
     <label className="block text-sm font-medium mb-2 ms-2 text-start">
       {label}
@@ -46,7 +37,10 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
 
   useEffect(() => {
     if (initialData) {
+      // keep password empty (security)
       setFormData({ ...initialData, password: '' });
+    } else {
+      setFormData({ name: '', email: '', password: '' });
     }
   }, [initialData]);
 
@@ -54,12 +48,10 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
     const errors = {};
     if (!formData.name.trim()) errors.name = 'Name is required';
     if (!formData.email.trim()) errors.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      errors.email = 'Invalid email format';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Invalid email format';
     if (!userId) {
       if (!formData.password) errors.password = 'Password is required';
-      else if (formData.password.length < 6)
-        errors.password = 'Password must be at least 6 characters';
+      else if (formData.password.length < 6) errors.password = 'Password must be at least 6 characters';
     }
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -80,12 +72,12 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
     setApiError(null);
 
     try {
-      const res = userId
-        ? await api.put(`/users/${userId}`, formData)
-        : await api.post('/users', formData);
-      onSuccess(res.data);
+      const res = userId ? await api.put(`/users/${userId}`, formData) : await api.post('/users', formData);
+      // Normalize: some backends return { data: { ... } }
+      const payload = res?.data?.data ?? res?.data ?? res;
+      onSuccess(payload);
     } catch (err) {
-      setApiError(err.response?.data?.title || 'An error occurred.');
+      setApiError(err.response?.data?.title ?? err.response?.data?.message ?? 'An error occurred.');
     } finally {
       setLoading(false);
     }
@@ -93,33 +85,9 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
 
   return (
     <form onSubmit={handleSubmit} className="p-5">
-      <InputField
-        isDarkmode={isDarkmode}
-        label="Name"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        error={validationErrors.name}
-      />
-      <InputField
-        isDarkmode={isDarkmode}
-        label="Email"
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        error={validationErrors.email}
-      />
-      <InputField
-        isDarkmode={isDarkmode}
-        label="Password"
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        error={validationErrors.password}
-        required={!userId}
-      />
+      <InputField isDarkmode={isDarkmode} label="Name" name="name" value={formData.name} onChange={handleChange} error={validationErrors.name} />
+      <InputField isDarkmode={isDarkmode} label="Email" type="email" name="email" value={formData.email} onChange={handleChange} error={validationErrors.email} />
+      <InputField isDarkmode={isDarkmode} label="Password" type="password" name="password" value={formData.password} onChange={handleChange} error={validationErrors.password} required={!userId} />
 
       {apiError && (
         <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-md">
@@ -130,13 +98,7 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
       )}
 
       <div className="flex justify-end mt-6">
-        <Button
-          type="submit"
-          disabled={loading}
-          label={loading ? 'Processing...' : userId ? 'Update User' : 'Create User'}
-          icon={loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
-          className="bg-blue-500 hover:bg-blue-600 text-white"
-        />
+        <Button type="submit" disabled={loading} label={loading ? 'Processing...' : userId ? 'Update User' : 'Create User'} icon={loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null} className="bg-blue-500 hover:bg-blue-600 text-white" />
       </div>
     </form>
   );
