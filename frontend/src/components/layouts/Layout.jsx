@@ -2,12 +2,9 @@ import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Headers';
-import { useDarkMode } from '../../hooks/useDarkMode';
 
-export default function Layout() {
-  const [darkMode, toggleDarkMode] = useDarkMode();
+export default function Layout({darkMode, toggleDarkMode}) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   // Open sidebar by default on desktop
   useEffect(() => {
     const handleResize = () => {
@@ -43,7 +40,7 @@ export default function Layout() {
           toggleSidebar={toggleSidebar}
         />
         <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-600">
-          <Outlet />
+          <Outlet darkMode={darkMode}/>
         </main>
       </div>
     </div>

@@ -8,7 +8,8 @@ export default function Header({
   toggleSidebar,
 }) {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between p-4 bg-white dark:bg-gray-800 shadow-md transition-colors">
+    <header className={`sticky top-0 z-30 flex items-center justify-between p-4   shadow-md transition-colors
+          ${ darkMode ? 'bg-gray-800 dark:bg-gray-800' : 'bg-gray-400 dark:bg-gray-400'}`}>
       {/* Mobile sidebar toggle */}
       <button
         onClick={toggleSidebar}
