@@ -49,7 +49,7 @@ export default function Dashboard({darkMode}) {
   ];
 
   return (
-    <div className={`space-y-8 p-7 h-full ${darkMode ? 'bg-gray-700 dark:bg-gray-700' : 'bg-gray-300 text-gray-600'} `}>
+    <div className={`space-y-8 p-7 h-full ${darkMode.pagesBgMode} `}>
       <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
       {/* --- Stat Cards Section --- */}
       <div className="grid gap-6 md:grid-cols-3">
@@ -58,7 +58,7 @@ export default function Dashboard({darkMode}) {
           <motion.div
             key={title}
             className={`p-6 rounded-xl shadow-md flex items-center justify-between
-              ${darkMode ? 'bg-gray-800 dark:bg-gray-800' : 'bg-gray-500 text-gray-100'}`}
+             ${darkMode.componentsBgMode}`}
             whileHover={{ scale: 1.02 }}
             transition={{ type: 'spring', stiffness: 300, damping: 15 }}
           >

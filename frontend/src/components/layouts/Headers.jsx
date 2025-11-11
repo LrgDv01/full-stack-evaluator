@@ -9,7 +9,7 @@ export default function Header({
 }) {
   return (
     <header className={`sticky top-0 z-30 flex items-center justify-between p-4   shadow-md transition-colors
-          ${ darkMode ? 'bg-gray-800 dark:bg-gray-800' : 'bg-gray-400 dark:bg-gray-400'}`}>
+          ${ darkMode ? 'bg-gray-800 dark:bg-gray-800' : 'bg-gray-300 dark:bg-gray-300'}`}>
       {/* Mobile sidebar toggle */}
       <button
         onClick={toggleSidebar}

@@ -14,7 +14,7 @@ export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
       className={`
         fixed inset-y-0 left-0 z-30 transform transition-all duration-300 ease-in-out
         overflow-y-auto shadow-xl
-        ${darkMode ? 'bg-gray-900 dark:bg-gray-900 text-gray-200' : 'bg-gray-200 dark:bg-gray-200 text-gray-800'}
+        ${darkMode ? 'bg-gray-900 dark:bg-gray-900 text-gray-200' : 'bg-gray-400 dark:bg-indigo-100 text-gray-800'}
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         w-64 md:translate-x-0 md:relative
         ${isOpen ? 'md:w-64' : 'md:w-20'}
@@ -54,11 +54,9 @@ export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
                     onClick={() => window.innerWidth < 768 && toggleOpen()}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-3 rounded transition-colors ${
-                        isActive
-                            ? 'bg-indigo-500 text-white hover:text-white dark:hover:bg-indigo-700'
-                            : darkMode
-                            ? 'hover:bg-gray-300 dark:hover:bg-gray-300 text-white'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-400 text-gray'
+                        isActive ? 'bg-indigo-500 text-white hover:text-white dark:hover:bg-indigo-700'
+                            : darkMode ? 'hover:bg-gray-300 dark:hover:bg-gray-300 text-white'
+                              : 'hover:bg-gray-100 dark:hover:bg-gray-400 text-gray'
                         }`
                     }
                     >

@@ -11,9 +11,13 @@ const Tasks = lazy(() => import('./pages/Tasks'));
 
 function App() {
   const [darkMode, toggleDarkMode] = useDarkMode();
+  const pagesBgMode = darkMode ? 'bg-gray-700 dark:bg-gray-700' : 'dark:bg-indigo-200 text-gray-600'
+  const componentsBgMode = darkMode ? 'bg-gray-500 dark:bg-gray-500' : 'bg-gray-400 dark:bg-gray-400 text-gray-600'
   return (
     <div className={` dark:bg-gray-900 min-h-screen `}>
-      <Toaster position="top-right" reverseOrder={false} />
+      
+      {/* <Toaster position="top-right" reverseOrder={false} /> */}
+      <Toaster position="top-right"  />
       <Router>
         <Suspense
           fallback={
@@ -24,9 +28,9 @@ function App() {
         >
           <Routes>
             <Route element={<Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode}/>}>
-              <Route path="/" element={<Dashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/" element={<Dashboard darkMode={{pagesBgMode, componentsBgMode}} toggleDarkMode={toggleDarkMode} />} />
+              <Route path="/users" element={<Users darkMode={{pagesBgMode, componentsBgMode}} toggleDarkMode={toggleDarkMode}/>} />
+              <Route path="/tasks" element={<Tasks darkMode={pagesBgMode} toggleDarkMode={toggleDarkMode}/>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

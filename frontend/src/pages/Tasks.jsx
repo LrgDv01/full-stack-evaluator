@@ -17,11 +17,11 @@ import TaskForm from '../components/tasks/TaskForm.jsx';
 import SearchBar from '../components/tasks/SearchBar.jsx'; // Or implement as input if missing
 import UserForm from '../components/users/UserForm.jsx';
 import { useTaskManagement } from '../hooks/useTaskManagement.js';
-import { useDarkMode } from '../hooks/useDarkMode.js';
+// import { useDarkMode } from '../hooks/useDarkMode.js';
 import { fetchUsers } from '../api/userService.js'; // For fetching users
 // import { useUsers } from '../hooks/useUsers.js';        
 
-function Tasks() {
+function Tasks({darkMode}) {
   // UI States - Grouped for readability
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -44,7 +44,7 @@ function Tasks() {
     toggle: toggleTask,     // ← alias
     reorder: updateTaskOrder, // ← alias
   } = useTaskManagement();
-  const [darkMode, toggleDarkMode] = useDarkMode();
+  // const [darkMode, toggleDarkMode] = useDarkMode();
 
   // Fetch users on mount - Handle errors gracefully
   useEffect(() => {
@@ -138,18 +138,18 @@ const handleDelete = async (id) => {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode}`}>
 
       <div className="mx-auto p-6">
         {/* Header - Flexible for responsiveness */}
         {/* User Management - Card for visual separation */}
-        
      
         {/* Search */}
         <div className="px-2">
           <div className="mb-3 flex justify-between items-center">
             <SearchBar isDarkmode={darkMode} value={searchTerm} onChange={setSearchTerm} onClear={() => setSearchTerm('')} />
-            <Button  isDarkmode={darkMode} label={<><Plus className="h-5 w-5 mr-1"/> Add Task</>} onClick={() => setShowCreateModal(true)} /> 
+            <Button  isDarkmode={darkMode} label={<><Plus className="h-5 w-5 mr-1"/> Add Task</>} 
+                      onClick={() => setShowCreateModal(true)} /> 
           </div>
           {/* Task List */}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
