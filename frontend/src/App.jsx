@@ -10,7 +10,7 @@ const Tasks = lazy(() => import('./pages/Tasks'));
 
 function App() {
   const [darkMode] = useDarkMode();
-
+  console.log('APP : ', darkMode)
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
       <Router>

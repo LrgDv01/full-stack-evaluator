@@ -15,11 +15,11 @@ import Modal from '../components/modals/modal.jsx';
 import TaskList from '../components/tasks/TaskList.jsx'; // Assuming this wraps SortableTaskItem
 import TaskForm from '../components/tasks/TaskForm.jsx';
 import SearchBar from '../components/tasks/SearchBar.jsx'; // Or implement as input if missing
-import UserForm from '../components/UserForm.jsx';
+import UserForm from '../components/users/UserForm.jsx';
 import { useTaskManagement } from '../hooks/useTaskManagement.js';
 import { useDarkMode } from '../hooks/useDarkMode.js';
 import { fetchUsers } from '../api/userService.js'; // For fetching users
-import { useUsers } from '../hooks/useUsers.js';        
+// import { useUsers } from '../hooks/useUsers.js';        
 
 function Tasks() {
   // UI States - Grouped for readability
@@ -29,7 +29,7 @@ function Tasks() {
   const [editingTask, setEditingTask] = useState(null); // Null or task object for edit modal
   const [currentUser, setCurrentUser] = useState(null); // Selected user for task creation
   const [users, setUsers] = useState([]); // List of users for dropdown
-  const {user, addUser } = useUsers(); 
+  // const {user, addUser } = useUsers(); 
 
 
   // Hooks - Data and theme
@@ -139,13 +139,7 @@ const handleDelete = async (id) => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 p-6 max-w-1xl mx-auto">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex pb-3">
-            <ListTodoIcon className="h-8 w-8 text-indigo-600 me-3"/> Task Manager</h1>
-          <div className="flex items-center gap-4">
-            <Button isDarkmode={darkMode} type={'toggle'} icon={darkMode ?  <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />} onClick={toggleDarkMode} />           
-          </div>
-      </div>
+
       <div className="mx-auto p-6">
         {/* Header - Flexible for responsiveness */}
         {/* User Management - Card for visual separation */}
