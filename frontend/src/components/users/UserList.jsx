@@ -65,9 +65,9 @@ export default function UserList({ darkMode }) {
   if (error) return <p className="text-red-600 text-center">{error}</p>;
 
   return (
-    <div className="relative space-y-6 mx-6 p-3">
+    <div className="relative m-5 p-3">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
         <div className="flex flex-row justify-between items-center gap-3 w-full">
           <SearchBar
             isDarkmode={darkMode}
