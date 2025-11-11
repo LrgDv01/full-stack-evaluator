@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Users, ListTodo, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Home, Users, ListTodo, ChevronLeft, List } from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: Home, label: 'Dashboard' },
@@ -8,62 +8,79 @@ const navItems = [
   { to: '/tasks', icon: ListTodo, label: 'Tasks' },
 ];
 
-export default function Sidebar({ darkMode }) {
-  const [open, setOpen] = useState(false);
-
+export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
   return (
-    <>
-      {/* Mobile toggle */}
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg md:hidden"
-      >
-        <Menu className="h-6 w-6" />
-      </button>
+    <aside
+      className={`
+        fixed inset-y-0 left-0 z-30 transform transition-all duration-300 ease-in-out
+        overflow-y-auto shadow-xl
+        ${darkMode ? 'bg-gray-900 dark:bg-gray-900 text-gray-200' : 'bg-gray-300 dark:bg-gray-300 text-gray-800'}
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        w-64 md:translate-x-0 md:relative
+        ${isOpen ? 'md:w-64' : 'md:w-20'}
+      `}
+    >
+      {/* Collapse/Expand Button */}
+      <div className="hidden md:flex justify-end my-6 me-3">
+        <button
+          onClick={toggleOpen}
+          className="flex items-center gap-2 text-sm font-medium bg-gray-600 text-gray-600 dark:text-gray-300
+             hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors dark:hover:boder-indigo-400"
+          aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+        >
+          {isOpen ? (
+            <>
+              <ChevronLeft className="h-5 w-5" />
+              <span className={`${!isOpen && 'hidden'}`}></span>
+            </>
+          ) : (
+            <>
+              <List className="h-5 w-5" />
+              <span className={`${!isOpen && 'hidden'}`}></span>
+            </>
+          )}
+        </button>
+      </div>
 
-      {/* Backdrop */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
-
-      {/* Drawer */}
-      <aside
-        className={`fixed inset-y-0 left-0 w-64 p-6 transform transition-transform z-50
-          ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
-          ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-xl`}
-      >
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Task Manager
-          </h2>
-          <button
-            onClick={() => setOpen(false)}
-            className="md:hidden"
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        <nav className="space-y-2">
-          {navItems.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
-                ${isActive ? 'bg-indigo-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`
-              }
-            >
-              <Icon className="h-5 w-5" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-      </aside>
-    </>
+      {/* Navigation */}
+      <nav className="space-y-2">
+        {navItems.map((item) => {
+            const IconComponent = item.icon;
+            return (
+                <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end
+                    onClick={() => window.innerWidth < 768 && toggleOpen()}
+                    className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded transition-colors ${
+                        isActive
+                            ? 'bg-indigo-500 text-white hover:text-white dark:hover:bg-indigo-700'
+                            : darkMode
+                            ? 'hover:bg-gray-300 dark:hover:bg-gray-300 text-white'
+                            : 'hover:bg-gray-100 dark:hover:bg-gray-400 text-gray'
+                        }`
+                    }
+                    >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                        <IconComponent className="h-5 w-5 flex-shrink-0" />
+                        {/* Wrapper keeps width smooth even when closed */}
+                        <motion.div
+                            className="overflow-hidden"
+                            animate={{
+                                width: isOpen ? 'auto' : 0,
+                                opacity: isOpen ? 1 : 0,
+                                y: isOpen ? 0 : 5, // slide down slightly when closing
+                            }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            >
+                            <span className="whitespace-nowrap">{item.label}</span>
+                        </motion.div>
+                    </div>
+                </NavLink>
+            );
+        })}
+      </nav>
+    </aside>
   );
 }
