@@ -3,16 +3,17 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Layout from './components/layouts/Layout';
 import { useDarkMode } from './hooks/useDarkMode';
 import './styles/App.css';
+import { Toaster } from 'react-hot-toast';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Users = lazy(() => import('./pages/Users'));
 const Tasks = lazy(() => import('./pages/Tasks'));
 
 function App() {
-  const [darkMode] = useDarkMode();
-  console.log('APP : ', darkMode)
+  const [darkMode, toggleDarkMode] = useDarkMode();
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <div className={` dark:bg-gray-900 min-h-screen `}>
+      <Toaster position="top-right" reverseOrder={false} />
       <Router>
         <Suspense
           fallback={
@@ -22,8 +23,8 @@ function App() {
           }
         >
           <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
+            <Route element={<Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode}/>}>
+              <Route path="/" element={<Dashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
               <Route path="/users" element={<Users />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="*" element={<Navigate to="/" replace />} />
