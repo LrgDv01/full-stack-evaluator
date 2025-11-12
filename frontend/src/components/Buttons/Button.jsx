@@ -1,11 +1,11 @@
 export default function Button({
-  isDarkmode,
+  isDarkMode,
   label,
   variant = 'primary',
   onClick,
   size = 'md',
   disabled = false,
-  type = 'button',
+  type,
   className = '',
   icon = null,
 }) {
@@ -14,7 +14,7 @@ export default function Button({
 
   const variants = {
     primary: 'bg-blue-500 text-white hover:bg-blue-700 disabled:bg-blue-300',
-    secondary: 'bg-gray-400 text-gray-800 hover:bg-gray-400 disabled:bg-gray-100',
+    secondary: `dark:hover:bg-gray-400 disabled:bg-gray-100 ${isDarkMode.componentsBgMode}`,
     danger: 'bg-red-500 text-white hover:bg-red-700 disabled:bg-red-300',
     success: 'bg-green-500 text-white hover:bg-green-700 disabled:bg-green-300',
     dark: 'bg-gray-700 text-blue-400 hover:bg-gray-800 disabled:bg-gray-500',
@@ -27,7 +27,9 @@ export default function Button({
     lg: 'py-3 px-6 text-lg',
   };
 
-  const toggleStyle = isDarkmode ? variants.light : variants.dark;
+  const toggleStyle = isDarkMode ? variants.light : variants.dark;
+  console.log('BUTTON :', isDarkMode);
+  console.log('TYPE :', type);
 
   return (
     <button
@@ -35,7 +37,8 @@ export default function Button({
       className={`${baseStyles} ${type === 'toggle' ? toggleStyle : variants[variant]} ${sizes[size]} ${className}`}
       onClick={onClick}
       disabled={disabled}
-    >
+
+    >    
       {icon && <span className="w-5 h-5">{icon}</span>}
       {label}
     </button>

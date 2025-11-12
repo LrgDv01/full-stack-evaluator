@@ -21,21 +21,22 @@ export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
       `}
     >
       {/* Collapse/Expand Button */}
-      <div className="hidden md:flex justify-end my-6 me-3">
+      <div className="hidden md:flex justify-end my-6 me-2">
         <button
           onClick={toggleOpen}
-          className="flex items-center gap-2 text-sm font-medium bg-gray-600 text-gray-600 dark:text-gray-300
-             hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors dark:hover:boder-indigo-400"
+          className={`flex items-center gap-2 textsm font-medium bg-transparent border-2 border-indigo-400 py-0.5 w-15
+            hover:text-indigo-600 dark:hover:text-indigo-700 transition-colors dark:hover:border-indigo-700 
+              ${darkMode ? 'bg-gray-900 dark:bg-gray-900 text-gray-200' : '  dark:text-indigo-700'}`}
           aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
         >
           {isOpen ? (
             <>
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-6 w-6" />
               <span className={`${!isOpen && 'hidden'}`}></span>
             </>
           ) : (
             <>
-              <List className="h-5 w-5" />
+              <List className="h-6 w-6" />
               <span className={`${!isOpen && 'hidden'}`}></span>
             </>
           )}

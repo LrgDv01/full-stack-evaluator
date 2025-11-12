@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import Button from '../buttons/Button';
 
-const TaskForm = ({ task = null, onSubmit, onCancel }) => {
+const TaskForm = ({ isDarkMode, task = null, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({ title: '', description: '' });
   const [loading, setLoading] = useState(false);
 
@@ -74,6 +74,7 @@ const TaskForm = ({ task = null, onSubmit, onCancel }) => {
       
       <div className="flex justify-end gap-3 mt-6">
         <Button
+          isDarkMode={isDarkMode}
           type="button"
           variant="secondary"
           label="Cancel"
@@ -81,6 +82,7 @@ const TaskForm = ({ task = null, onSubmit, onCancel }) => {
           disabled={loading}
         />
         <Button
+          isDarkMode={isDarkMode}
           type="submit"
           variant="primary"
           label={loading ? 'Saving...' : (task ? 'Update Task' : 'Create Task')}
