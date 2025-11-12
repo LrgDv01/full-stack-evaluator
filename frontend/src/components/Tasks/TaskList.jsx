@@ -10,8 +10,8 @@ import TaskDetailsModal from '../modals/TaskDetailsModal';
    TaskItem – unchanged except for the prop name
    ------------------------------------------------- */
 const TaskItem = ({
-  task,
   isDarkMode,
+  task,
   onEdit,
   onDelete,
   onToggle,               // <-- renamed from onToggleComplete
@@ -81,6 +81,8 @@ const TaskItem = ({
       {/* Action buttons */}
       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
+          type="submit"
+          isDarkMode={isDarkMode}
           variant=""
           size="sm"
           icon={task.isCompleted ? <Undo className="h-5 w-5" /> : <Check className="h-5 w-5" />}
@@ -91,12 +93,14 @@ const TaskItem = ({
               : 'bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-600'
           }`}
           aria-label={task.isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
-        >
+        />
           {/* tooltip omitted for brevity */}
-        </Button>
+
 
         {/* View / Edit / Delete buttons */}
         <Button
+          type="button"
+          isDarkMode={isDarkMode}
           variant="secondary"
           size="sm"
           icon={<Eye className="h-5 w-5" />}
@@ -104,6 +108,8 @@ const TaskItem = ({
           aria-label="View task details"
         />
         <Button
+          type="button"
+          isDarkMode={isDarkMode}
           variant="primary"
           size="sm"
           icon={<Edit2 className="h-5 w-5" />}
@@ -111,6 +117,8 @@ const TaskItem = ({
           aria-label="Edit task"
         />
         <Button
+          type="button"
+          isDarkMode={isDarkMode}
           variant="danger"
           size="sm"
           icon={<Trash2 className="h-5 w-5" />}
@@ -136,7 +144,7 @@ const TaskItem = ({
 };
 
 /*  TaskList --------------------------  */
-const TaskList = ({ isDarkmode, tasks, onEdit, onDelete, onToggle }) => {  
+const TaskList = ({ isDarkMode, tasks, onEdit, onDelete, onToggle }) => {  
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
@@ -152,7 +160,7 @@ const TaskList = ({ isDarkmode, tasks, onEdit, onDelete, onToggle }) => {
           <TaskItem
             key={task.id}
             task={task}
-            isDarkMode={isDarkmode}
+            isDarkMode={isDarkMode}
             onEdit={onEdit}
             onDelete={onDelete}
             onToggle={onToggle}               // <-- forward the same name
@@ -162,7 +170,7 @@ const TaskList = ({ isDarkmode, tasks, onEdit, onDelete, onToggle }) => {
       </div>
       {isDetailsOpen && (
         <TaskDetailsModal
-          isDarkMode={isDarkmode}
+          isDarkMode={isDarkMode}
           task={selectedTask}
           onClose={() => setIsDetailsOpen(false)}
           onEdit={onEdit}
