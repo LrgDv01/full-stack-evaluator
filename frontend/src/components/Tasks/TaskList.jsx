@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Check, Trash2, Edit2, Undo, Eye } from 'lucide-react';
 import Button from '../buttons/Button';
 import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 import TaskDetailsModal from '../modals/TaskDetailsModal';
+import { useSelector, useDispatch } from 'react-redux';
+import { getAllTasks } from '../../features/tasks/tasksSlice';
 
-/* -------------------------------------------------
-   TaskItem – unchanged except for the prop name
-   ------------------------------------------------- */
+
+// TaskItem: unchanged except for the prop name
+
 const TaskItem = ({
   isDarkMode,
   task,
   onEdit,
   onDelete,
-  onToggle,               // <-- renamed from onToggleComplete
+  onToggle,               // renamed from onToggleComplete
   onView,
   }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -38,6 +40,7 @@ const TaskItem = ({
     <div
       ref={setNodeRef}
       style={style}
+      // Dynamic class: Complex dark/completed logic; hover for shadow
       className={`group flex items-center gap-3 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all 
            ${ task.isCompleted ? (isDarkMode ? 'bg-gray-700 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700' 
                 : 'bg-gray-300 dark:bg-gray-300 hover:bg-gray-400 dark:hover:bg-gray-400') 
@@ -48,6 +51,7 @@ const TaskItem = ({
       <button
         {...attributes}
         {...listeners}
+        // Touch-none: Prevents mobile scroll interference
         className={`border-none touch-none 
                 
          ${ task.isCompleted ? (isDarkMode ? ' dark:bg-gray-800 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-100' 
@@ -67,9 +71,11 @@ const TaskItem = ({
               : ( isDarkMode ? ' text-gray-700 dark:text-gray-700' 
                 : ' text-gray-400 dark:text-gray-200')}`}
         >
-          {task.title}
+         {/* Fallback: 'Untitled task' if no title (handles partial data) */}
+          {task?.title ?? 'Untitled task'}
         </h3>
         {task.description && (
+          // Truncate: Prevents long desc overflow
           <p className={`mt-1 ps-2 text-sm truncate 
           ${task.isCompleted ? (isDarkMode ? 'text-gray-400 dark:text-gray-400' : 'text-gray-600 dark:text-gray-600') 
             : (isDarkMode ? 'text-gray-700 dark:text-gray-700' : 'text-gray-200 dark:text-gray-200')}`}>
@@ -80,6 +86,7 @@ const TaskItem = ({
 
       {/* Action buttons */}
       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Toggle: Undo/Check icons based on state */}
         <Button
           type="submit"
           isDarkMode={isDarkMode}
@@ -98,6 +105,7 @@ const TaskItem = ({
 
 
         {/* View / Edit / Delete buttons */}
+        {/* View: Opens details modal */}
         <Button
           type="button"
           isDarkMode={isDarkMode}
@@ -116,6 +124,7 @@ const TaskItem = ({
           onClick={() => onEdit(task)}
           aria-label="Edit task"
         />
+        {/* Delete: Triggers confirmation modal */}
         <Button
           type="button"
           isDarkMode={isDarkMode}
@@ -143,16 +152,28 @@ const TaskItem = ({
   );
 };
 
-/*  TaskList --------------------------  */
+//  TaskList -------------------------- 
 const TaskList = ({ isDarkMode, tasks, onEdit, onDelete, onToggle }) => {  
+  // const { tasks, loading, error } = useSelector((state) => state.tasks);
+  // const dispatch = useDispatch();
+
+  // State: Manages details modal; selectedTask for display
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+
+  // useEffect(() => {
+  //   dispatch(getAllTasks());
+  // }, [dispatch]);
 
   const handleViewDetails = (task) => {
     setSelectedTask(task);
     setIsDetailsOpen(true);
   };
 
+  // if (loading) return <div>Loading tasks...</div>; // Simple spinner
+  // if (error) return <div>Error: {error}</div>; // Graceful failure
+
+  // TODO: Integrate Redux for global tasks if local state insufficient (e.g., quotas)
   return (
     <SortableContext items={tasks.map((t) => t.id)}>
       <div className="space-y-3">
@@ -163,7 +184,7 @@ const TaskList = ({ isDarkMode, tasks, onEdit, onDelete, onToggle }) => {
             isDarkMode={isDarkMode}
             onEdit={onEdit}
             onDelete={onDelete}
-            onToggle={onToggle}               // <-- forward the same name
+            onToggle={onToggle}      
             onView={handleViewDetails}
           />
         ))}

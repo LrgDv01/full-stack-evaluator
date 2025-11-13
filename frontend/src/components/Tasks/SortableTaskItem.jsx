@@ -22,7 +22,7 @@ function SortableTaskItem({
     transition,
     isDragging,
   } = useSortable({ id: task.id });
-
+  // Style: CSS.Transform for smooth DnD; opacity/zIndex for drag feedback
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: transition + ', border-color 0.2s, box-shadow 0.2s',
@@ -31,6 +31,7 @@ function SortableTaskItem({
   };
 
   return (
+    // Border changes on drag for visual cue; darkMode prop for theme
     <div
       ref={setNodeRef}
       style={style}
@@ -43,10 +44,11 @@ function SortableTaskItem({
         transform transition-all duration-200`}
     >
       <div className="flex items-center gap-3 flex-1">
+        {/* DnD handle: cursor-grab for usability */}
         <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
           <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
-
+        {/* Status button: Colors for completed/pending; onToggle flips state */}
         <button 
           onClick={() => onToggle(task)} 
           className={`text-sm font-medium px-3 py-1 rounded-full ${
@@ -59,6 +61,7 @@ function SortableTaskItem({
         </button>
 
         {isEditing ? (
+          // Edit mode: Form with autoFocus for quick edits
           <form onSubmit={onSaveEdit} className="flex items-center gap-2 flex-1">
             <input
               type="text"
@@ -80,6 +83,7 @@ function SortableTaskItem({
           </form>
         ) : (
           <div className="flex-1">
+            {/* Display: Line-through for completed; fallback 'Unknown' for user */}
             <span className={`text-lg font-medium ${task.isDone ? 'line-through text-gray-500' : ''}`}>
               {task.title}
             </span>
@@ -90,6 +94,7 @@ function SortableTaskItem({
         )}
 
         {!isEditing && (
+          // Group-hover: Edit button appears on hover for clean UI
           <button
             onClick={() => onEdit(task)}
             className="opacity-0 group-hover:opacity-100 transition"
