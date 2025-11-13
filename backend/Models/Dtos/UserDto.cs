@@ -12,8 +12,9 @@ namespace TaskManager.Models.Dtos
         public string Email { get; set; } = string.Empty;
 
         [Required, MinLength(8)]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty; // Plain text – hashed in controller
 
-        public List<TaskItemDto>? Tasks { get; set; }  // Optional: Include tasks if needed
+        // Optional TODO : allows creating a user with initial tasks in one call (not used yet)
+        public List<TaskItemDto>? Tasks { get; set; } 
     }
 }

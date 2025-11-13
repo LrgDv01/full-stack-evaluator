@@ -19,6 +19,7 @@ namespace TaskManager.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                // Improvement: Unique index prevents duplicate emails; supports fast lookups in auth flows
                 entity.HasIndex(e => e.Email).IsUnique(); // Ensure unique emails
             });
 
@@ -26,7 +27,9 @@ namespace TaskManager.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200); // Fix: Match to 200 (or change attribute to match)
+                // Index on UserId speeds up per-user queries, for example in (TasksController filters)
                 entity.HasIndex(e => e.UserId); // Improvement: Index for faster joins/queries on UserId
+                // Cascade delete for simplicity (tasks auto-remove on user delete);  Switch to Restrict if archiving needed
                 entity.HasOne(e => e.User)
                       .WithMany(u => u.Tasks)
                       .HasForeignKey(e => e.UserId)

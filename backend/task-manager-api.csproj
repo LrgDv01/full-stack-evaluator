@@ -8,15 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" /> <!-- Password hashing -->
+    <PackageReference Include="DotNetEnv" Version="3.1.1" /> <!-- .env support for local dev -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" /> <!-- PostgreSQL provider -->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" /> <!-- Swagger generation -->
   </ItemGroup>
 
 </Project>

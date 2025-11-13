@@ -1,6 +1,6 @@
-// Models/Dtos/TaskResponse.cs
 namespace TaskManager.Models.Dtos;
 
+// Read-only response – hides internal navigation (User) and exposes only needed fields
 public record TaskResponse(
     int Id,
     string Title,
