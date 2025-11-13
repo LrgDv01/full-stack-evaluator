@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',               // <-- ONLY HERE
-  timeout: 10_000,
+  baseURL: '/api',               // Proxy to backend in dev (Vite proxy) – no CORS in prod
+  timeout: 10_000,              // 10 s – protects UI from hanging on slow network
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Optional: global error interceptor (nice for dev)
+// Global error logger – helps surface API quirks during dev without crashing UI
 api.interceptors.response.use(
   (res) => res,
   (err) => {
