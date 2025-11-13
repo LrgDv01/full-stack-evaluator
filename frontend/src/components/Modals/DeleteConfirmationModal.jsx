@@ -7,6 +7,7 @@ const DeleteConfirmationModal = ({ isDarkmode, title, onConfirm, onCancel }) => 
   return (
     <Modal isDarkMode={isDarkmode} onClose={onCancel}>
       <div>
+         {/* Design choice: Centered alert icon for visual emphasis; red for danger */}
         <div className="flex flex-col items-center gap-2 mb-6">
           <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-200 flex items-center justify-center mb-5">
             <AlertTriangle className="h-7 w-7 text-red-600" />
@@ -15,12 +16,13 @@ const DeleteConfirmationModal = ({ isDarkmode, title, onConfirm, onCancel }) => 
             <h3 className="text-lg font-bold">
               Delete Task
             </h3>
+             {/* Dynamic title in message for context; warns irreversible action */}
             <p className="my-3 text-sm  ">
               Are you sure you want to delete "{title}"? This action cannot be undone.
             </p>
           </div>
         </div>
-
+        {/* Improvement: Right-aligned buttons for standard dialog flow (Cancel first) */}
         <div className="flex justify-end gap-3">
           <Button
             type="button"

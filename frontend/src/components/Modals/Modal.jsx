@@ -2,15 +2,18 @@ import { X } from 'lucide-react';
 
 function Modal({ isDarkMode, children, onClose, title = '' }) {
   return (
+    // Assumes: Fixed overlay for modal; z-50 to layer over content
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      {/* Design choice: Animate-in for smooth entry; max-w-md for responsiveness */}
       <div className={`bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative animate-in fade-in zoom-in duration-200
           ${isDarkMode.pagesBgMode} `}>
         <div className="flex items-center justify-between mb-4">
           {title && (
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-bold">
               {title}
             </h2>
           )}
+          {/* Improvement: Hover states for close button; aria-label implied via icon */}
           <button
             onClick={onClose}
             className={`text-gray-400 hover:text-gray-300 dark:hover:text-gray-300 
