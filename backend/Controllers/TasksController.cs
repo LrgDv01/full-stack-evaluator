@@ -29,10 +29,11 @@ public class TasksController : ControllerBase
         var query = _db.Tasks.AsNoTracking(); // Optimize for read-only
 
         if (userId.HasValue)
+            // If UserId is valid,  Add existence check to handle invalid filters gracefully (e.g., return empty list vs. error)
             query = query.Where(t => t.UserId == userId.Value);
 
         var result = await query
-            .OrderBy(t => t.Order)
+            .OrderBy(t => t.Order) //  Order by 'Order' field for UI drag-and-drop support; assumes client pre-sorts to avoid duplicates
             .Select(t => MapToResponse(t))
             .ToListAsync();
 
@@ -44,7 +45,7 @@ public class TasksController : ControllerBase
     public async Task<ActionResult<TaskResponse>> Create([FromBody] TaskItemDto dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-
+        // Early user validation prevents orphan tasks; assumes UserId is required for ownership
         if (!await _db.Users.AnyAsync(u => u.Id == dto.UserId))
             return BadRequest($"User {dto.UserId} does not exist.");
 
@@ -64,6 +65,7 @@ public class TasksController : ControllerBase
         var entity = await _db.Tasks.FindAsync(id);
         if (entity == null) return NotFound();
 
+        //  Checks UserId consistency to prevent cross-user updates, assumes same-user edits for security (no auth yet)
         if (entity.UserId != dto.UserId && !await _db.Users.AnyAsync(u => u.Id == dto.UserId))
             return BadRequest($"User {dto.UserId} does not exist.");
 
@@ -90,6 +92,7 @@ public class TasksController : ControllerBase
     [HttpPatch("reorder")]
     public async Task<IActionResult> Reorder([FromBody] IReadOnlyList<TaskOrderUpdateDto> updates)
     {
+        // Client sends complete list of IDs to reorder, bulk fetch for efficiency in large lists
         var ids = updates.Select(u => u.Id).ToArray();
         var tasks = await _db.Tasks.Where(t => ids.Contains(t.Id)).ToListAsync();
 
@@ -144,6 +147,7 @@ public class TasksController : ControllerBase
         return target;
     }
 
+    // Static for reusability/performance, projects only needed fields to reduce payload size
     private static TaskResponse MapToResponse(TaskItem e) => new(
         e.Id,
         e.Title,

@@ -1,110 +1,120 @@
 # Frontend README (React + Vite)
 
-## 📚 Table of Contents
+---
 
-1. Overview
-2. Prerequisites & Installation
-3. Why pnpm instead of npm?
-4. Project Setup & Commands
-5. Tailwind CSS Setup
-6. Vite Proxy & CORS Integration
-7. Cleaning npm Artifacts / Switching Fully to pnpm
-8. .module.css Explanation
-9. Environment Variables (.env)
-10. Run Frontend
+## 📘 Table of Contents
+
+1. [Overview](#1-overview)
+2. [Prerequisites & Installation](#2-prerequisites--installation)
+3. [Why pnpm Instead of npm?](#3-why-pnpm-instead-of-npm)
+4. [Project Setup & Commands](#4-project-setup--commands)
+5. [Tailwind CSS Setup](#5-tailwind-css-setup)
+6. [Vite Proxy & CORS Integration](#6-vite-proxy--cors-integration)
+7. [Cleaning npm Artifacts / Switching Fully to pnpm](#7-cleaning-npm-artifacts--switching-fully-to-pnpm)
+8. [.module.css Explanation](#8-modulecss-explanation)
+9. [Environment Variables (.env)](#9-environment-variables-env)
+10. [Run Frontend](#10-run-frontend)
+11. [Submission Notes (Per Exam Guidelines)](#11-submission-notes-per-exam-guidelines)
 
 ---
 
 ## 1. Overview
 
-This is the frontend of the Full-Stack Evaluator project, built using **React 18 + Vite** for high-speed development, with optional **pnpm** as the package manager and **Tailwind CSS** for styling.
+The **frontend** of the **Full-Stack Evaluator** project is built with **React 18 + Vite** for high-speed development. It uses **pnpm** for efficient dependency management and **Tailwind CSS** for rapid, responsive styling.
 
 ---
 
 ## 2. Prerequisites & Installation
 
-* Install **Node.js (v18+)** from [https://nodejs.org/](https://nodejs.org/)
-  Verify installation:
+### ✅ Install Node.js (v18+)
 
-  ```bash
-  node -v
-  ```
-* Install **pnpm (recommended)** globally:
+[Download Node.js](https://nodejs.org/)
 
-  ```bash
-  npm install -g pnpm
-  ```
-* Install dependencies inside `/frontend`:
+```bash
+node -v  # verify version
+```
 
-  ```bash
-  cd frontend
-  pnpm install
-  ```
+### 🧩 Install pnpm (Recommended)
 
-  > You can use `npm install` if preferred, but pnpm is faster and more efficient.
+```bash
+npm install -g pnpm
+```
+
+### 📦 Install Dependencies
+
+```bash
+cd frontend
+pnpm install
+```
+
+> You can use `npm install` if preferred, but `pnpm` is **faster and more space-efficient**.
 
 ---
 
-## 3. Why pnpm instead of npm?
+## 3. Why pnpm Instead of npm?
 
-| Feature              | pnpm                             | npm                     |
-| -------------------- | -------------------------------- | ----------------------- |
-| Speed                | ✅ 2–3× faster installs           | ❌ Slower                |
-| Disk Usage           | ✅ Saves space via global store   | ❌ Duplicates packages   |
-| Dependency Isolation | ✅ Stricter & safer               | ⚠️ Can have conflicts   |
-| Monorepo Support     | ✅ Excellent (frontend + backend) | ⚠️ Requires workarounds |
-| Recommended By       | Vite, modern React apps          | Default Node.js         |
+| Feature | pnpm | npm |
+|----------|------|-----|
+| Speed | ✅ 2–3× faster installs | ❌ Slower |
+| Disk Usage | ✅ Global store saves space | ❌ Duplicates packages |
+| Dependency Isolation | ✅ Safer & stricter | ⚠️ Potential conflicts |
+| Monorepo Support | ✅ Excellent (frontend + backend) | ⚠️ Requires tweaks |
+| Recommended By | Vite, modern React apps | Default Node.js |
 
-**Reason for this project:** Faster setup for timed evaluation (4–5h total), better package isolation, cleaner structure.
+> **Reason:** Faster setup for timed evaluation (4–5 hours total) and cleaner dependency management.
 
 ---
 
 ## 4. Project Setup & Commands
 
-| Command        | Description                                                                            |
-| -------------- | -------------------------------------------------------------------------------------- |
-| `pnpm install` | Install all dependencies                                                               |
-| `pnpm run dev` | Start Vite development server (default [http://localhost:5173](http://localhost:5173)) |
-| `pnpm build`   | Production build                                                                       |
-| `pnpm preview` | Preview production build                                                               |
+| Command | Description |
+|----------|-------------|
+| `pnpm install` | Install all dependencies |
+| `pnpm run dev` | Start Vite dev server (default: [http://localhost:5173](http://localhost:5173)) |
+| `pnpm run build` | Build for production |
+| `pnpm run preview` | Preview production build |
 
 ---
 
 ## 5. Tailwind CSS Setup
 
-1. Install Tailwind:
+### 1️⃣ Install Tailwind
 
-   ```bash
-   pnpm add -D tailwindcss postcss autoprefixer
-   npx tailwindcss init -p
-   ```
-2. Configure `tailwind.config.js`:
+```bash
+pnpm add -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
 
-   ```js
-   export default {
-     content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
-     theme: {
-       extend: {},
-     },
-     plugins: [],
-   }
-   ```
-3. Add Tailwind to `src/index.css` or `src/tailwind-input.css`:
+### 2️⃣ Configure `tailwind.config.js`
 
-   ```css
-   @tailwind base;
-   @tailwind components;
-   @tailwind utilities;
-   ```
+```js
+export default {
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### 3️⃣ Add to CSS Entry File
+
+In `src/index.css` or `src/tailwind-input.css`:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
 
 ---
 
 ## 6. Vite Proxy & CORS Integration
 
-✔ Backend URL (example): `http://localhost:5215`
-✔ Frontend runs at: `http://localhost:5173`
+- **Backend:** http://localhost:5215  
+- **Frontend:** http://localhost:5173
 
-**In `vite.config.js`:**
+### ⚙️ vite.config.js
 
 ```js
 export default defineConfig({
@@ -120,7 +130,7 @@ export default defineConfig({
 })
 ```
 
-**Backend (`Program.cs`) CORS config:**
+### 🧱 Backend (Program.cs)
 
 ```csharp
 builder.Services.AddCors(options =>
@@ -135,59 +145,59 @@ var app = builder.Build();
 app.UseCors("AllowLocalhost");
 ```
 
-**✅ Why use both?**
+### ✅ Why Use Both?
 
-| Feature              | Vite Proxy            | Backend CORS  |
-| -------------------- | --------------------- | ------------- |
-| Dev Convenience      | ✅ Yes                 | ⚠️ Not needed |
-| Works Without Proxy  | ❌ No                  | ✅ Yes         |
-| Production Required? | ❌ No                  | ✅ Yes         |
-| Best Practice Combo  | ✅✅ Both used together |               |
+| Feature | Vite Proxy | Backend CORS |
+|----------|-------------|--------------|
+| Dev Convenience | ✅ Yes | ⚠️ Not needed |
+| Works Without Proxy | ❌ No | ✅ Yes |
+| Needed in Production | ❌ No | ✅ Yes |
+| Best Practice | ✅✅ Use both |
 
 ---
 
-## 7. Cleaning npm Artifacts / Switch Fully to pnpm
+## 7. Cleaning npm Artifacts / Switching Fully to pnpm
 
 ```bash
-# Inside /frontend folder
 rm -rf node_modules package-lock.json
 pnpm install
 ```
 
-Creates `pnpm-lock.yaml` → commit this file.
+> Creates `pnpm-lock.yaml` — commit this file.
 
-✅ Optional Commit Message:
-
-> "Switched fully to pnpm, removed npm artifacts for consistent dependency management."
+**Optional Commit Message:**
+```
+Switched fully to pnpm, removed npm artifacts for consistent dependency management.
+```
 
 ---
 
 ## 8. .module.css Explanation
 
-`.module.css` is used because:
-✔ Scopes CSS only to components that import it.
-✔ Prevents global class name conflicts.
-✔ Automatically generates unique class names.
-✔ Recommended by React for scalable UI.
+`.module.css` files:
+- ✅ Scope CSS only to the importing component
+- ✅ Prevent global class conflicts
+- ✅ Auto-generate unique class names
+- ✅ Recommended by React for scalable UI architecture
 
 ---
 
 ## 9. Environment Variables (.env)
 
-Example `.env` file:
+### 📄 Example `.env` File
 
 ```env
 VITE_API_BASE_URL="http://localhost:5215/api"
 VITE_APP_TITLE="Task Manager App"
 ```
 
-Usage in code:
+### 💻 Usage in Code
 
 ```js
 const api = import.meta.env.VITE_API_BASE_URL;
 ```
 
-✅ .env is optional but useful for API URLs, app titles, keys, etc.
+> `.env` is optional but helpful for configuring API URLs, titles, and environment-based settings.
 
 ---
 
@@ -199,5 +209,52 @@ pnpm install
 pnpm run dev
 ```
 
-Access at: `http://localhost:5173`
+Access the app at → [http://localhost:5173](http://localhost:5173)
+
+---
+
+## 11. Submission Notes (Per Exam Guidelines)
+
+### 🧾 Short Write-Up
+
+The frontend connects to the backend API via **Axios** using a **Vite proxy** to bypass CORS issues. Focus areas included task CRUD, drag-and-drop sorting, user management, and UI responsiveness with dark mode and toasts.
+
+Structure:
+- **Hooks:** Local state (optimistic updates)
+- **Components:** Reusable modals, forms, and lists
+- **UI:** Tailwind + animations (Framer Motion)
+
+> Prioritized functionality and clarity under time constraints.
+
+### 📌 Clarified Assumptions
+
+- **API:** Backend runs at `http://localhost:5215/api`; proxy + `.env` handle routing.
+- **Styling:** Tailwind for rapid UI; additional libs like `dnd-kit`, `framer-motion`, `react-hot-toast`.
+- **State Management:** Local hooks instead of Redux for simplicity.
+- **Responsiveness:** Mobile-first design with dark mode persistence.
+- **Time:** Focused on CRUD, validations, and API integration (skipped tests/auth).
+
+### 🛠️ What Was Implemented
+
+- **API Services:** Axios client + interceptors
+- **UI Components:** Sidebar, header, modals, forms, task/user lists
+- **Hooks:** useDarkMode, useTaskManagement, useUsers
+- **Pages:** Dashboard (charts), Tasks, Users
+- **Extras:** Toasts, loaders, animations
+
+### ⚠️ What’s Missing
+
+- Authentication (JWT/login)
+- Tests (Jest/React Testing Library)
+- Pagination / infinite scroll
+- Real-time updates (WebSockets)
+- Advanced theming / Redux integration
+
+### 🧪 How to Test
+
+1. **Setup & Run:** Follow [Sections 2](#2-prerequisites--installation) and [10](#10-run-frontend)
+2. **Basic:** Create users and tasks, toggle task completion, edit, delete, reorder via DnD
+3. **Advanced:** Dark mode persistence, dashboard updates, validation & toast handling
+4. **Edge Cases:** Invalid data → validation errors; stop backend → API error handled
+5. **Verification:** Inspect Network tab for `/api` calls and confirm DB changes via pgAdmin
 

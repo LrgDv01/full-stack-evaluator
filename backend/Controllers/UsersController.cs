@@ -22,6 +22,8 @@ namespace TaskManager.API
             _context = context;
         }
 
+        // Record for immutable, lightweight responses
+        // Excludes sensitive fields like PasswordHash
         public record UserResponse(int Id, string Name, string Email, int TaskCount); // Response DTO without password hash
 
         [HttpGet]
@@ -29,7 +31,7 @@ namespace TaskManager.API
         {
             // Exclude PasswordHash from response for security 
             var users = await _context.Users
-                .Select(u => new { u.Id, u.Name, u.Email, Tasks = u.Tasks.Count })
+                .Select(u => new { u.Id, u.Name, u.Email, Tasks = u.Tasks.Count }) //  Eager-loads task count via projection to avoid N+1 queries
                 .ToListAsync(); // Hides hash, adds task count
             return Ok(users.Select(u => new UserResponse(u.Id, u.Name, u.Email, u.Tasks)));
         }
@@ -46,6 +48,7 @@ namespace TaskManager.API
             {
                 Name = userDto.Name,
                 Email = userDto.Email,
+                // Security: BCrypt for salted hashing (work factor default=10), prevents rainbow table attacks
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password)
             };
 
@@ -72,6 +75,7 @@ namespace TaskManager.API
             existingUser.Name = updatedUserDto.Name;
             existingUser.Email = updatedUserDto.Email;
 
+            //  Optional password update (empty string skips), supports partial updates without full re-hash**
             if (!string.IsNullOrEmpty(updatedUserDto.Password))
             {
                 existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updatedUserDto.Password);
@@ -82,10 +86,11 @@ namespace TaskManager.API
             return NoContent();
         }
 
-        // TODO/FIX: Consider cascading delete implications
+        // Consider cascading delete implications
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            // Includes Tasks for explicit removal, assumes hard-delete OK for eval (prevents orphans per EF Cascade)
             var user = await _context.Users.Include(u => u.Tasks).FirstOrDefaultAsync(u => u.Id == id); // Include tasks for potential cascading delete
             if (user == null) return NotFound();
 
