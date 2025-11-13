@@ -3,8 +3,10 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import api from '../../api/axios';
 import Button from '../buttons/Button';
 
+// Component: Reusable input with error display
 const InputField = ({ isDarkmode, label, type = 'text', name, value, onChange, error, required = true }) => (
   <div className={`mb-4`}>
+    {/* Label: Star for required; ms-2 for alignment */}
     <label className="block text-sm font-medium mb-2 ms-2 text-start">
       {label}
       {required && <span className="text-red-500 ml-2">*</span>}
@@ -22,6 +24,7 @@ const InputField = ({ isDarkmode, label, type = 'text', name, value, onChange, e
       required={required}
     />
     {error && (
+      // Error: Icon + message for feedback
       <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
         <AlertCircle className="w-4 h-4 mr-1" /> {error}
       </p>
@@ -30,6 +33,7 @@ const InputField = ({ isDarkmode, label, type = 'text', name, value, onChange, e
 );
 
 const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) => {
+  // State: FormData with password empty for security
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [validationErrors, setValidationErrors] = useState({});
   const [apiError, setApiError] = useState(null);
@@ -44,6 +48,7 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
     }
   }, [initialData]);
 
+  // Validation: Client-side checks before API
   const validateForm = () => {
     const errors = {};
     if (!formData.name.trim()) errors.name = 'Name is required';
@@ -72,6 +77,7 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
     setApiError(null);
 
     try {
+      // API: PUT for update, POST for create; normalize response
       const res = userId ? await api.put(`/users/${userId}`, formData) : await api.post('/users', formData);
       // Normalize: some backends return { data: { ... } }
       const payload = res?.data?.data ?? res?.data ?? res;
@@ -90,13 +96,14 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
       <InputField isDarkmode={isDarkmode} label="Password" type="password" name="password" value={formData.password} onChange={handleChange} error={validationErrors.password} required={!userId} />
 
       {apiError && (
+        // API feedback: Separate from validation
         <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-md">
           <p className="text-sm text-red-600 dark:text-red-400 flex items-center">
             <AlertCircle className="w-4 h-4 mr-2" /> {apiError}
           </p>
         </div>
       )}
-
+      {/* Submit: Disable on loading; dynamic label */}
       <div className="flex justify-end mt-6">
         <Button type="submit" isDarkMode={isDarkmode}  disabled={loading} label={loading ? 'Processing...' : userId ? 'Update User' 
             : 'Create User'} icon={loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null} className="bg-indigo-600 hover:bg-indigo-700 text-white" />
@@ -106,3 +113,5 @@ const UserForm = ({ isDarkmode, userId = null, onSuccess, initialData = null }) 
 };
 
 export default UserForm;
+
+// Validation and API normalization for safe usage.
