@@ -10,6 +10,7 @@ const navItems = [
 
 export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
   return (
+    // Aside: Fixed for mobile, relative for desktop; transform for slide animation
     <aside
       className={`
         fixed inset-y-0 left-0 z-30 transform transition-all duration-300 ease-in-out
@@ -24,6 +25,7 @@ export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
       <div className="hidden md:flex justify-end my-6 me-2">
         <button
           onClick={toggleOpen}
+          // Custom styles: Transparent button with border for subtle toggle
           className={`flex items-center gap-2 textsm font-medium bg-transparent border-2 border-indigo-400 py-0.5 w-15
             hover:text-indigo-600 dark:hover:text-indigo-700 transition-colors dark:hover:border-indigo-700 
               ${darkMode ? 'bg-gray-900 dark:bg-gray-900 text-gray-200' : '  dark:text-indigo-700'}`}
@@ -48,6 +50,7 @@ export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
         {navItems.map((item) => {
             const IconComponent = item.icon;
             return (
+              // NavLink: Active state for highlighting; closes mobile on click
                 <NavLink
                     key={item.to}
                     to={item.to}
@@ -63,7 +66,7 @@ export default function Sidebar({ darkMode, isOpen, toggleOpen }) {
                     >
                     <div className="flex items-center gap-3 overflow-hidden">
                         <IconComponent className="h-5 w-5 flex-shrink-0" />
-                        {/* Wrapper keeps width smooth even when closed */}
+                         {/* Wrapper keeps width smooth even when closed  */}
                         <motion.div
                             className="overflow-hidden"
                             animate={{
