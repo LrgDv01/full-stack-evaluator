@@ -11,14 +11,17 @@ const Tasks = lazy(() => import('./pages/Tasks'));
 
 function App() {
   const [darkMode, toggleDarkMode] = useDarkMode();
+  // Modes: Derived classes for theme consistency
   const pagesBgMode = darkMode ? 'bg-gray-700 dark:bg-gray-700' : 'dark:bg-indigo-200 text-gray-600'
   const componentsBgMode = darkMode ? 'bg-gray-500 dark:bg-gray-500' : 'bg-gray-300 dark:bg-gray-200 text-gray-600'
   return (
     <div className={` dark:bg-gray-900 min-h-screen `}>
       
       {/* <Toaster position="top-right" reverseOrder={false} /> */}
+      {/* Toaster: For notifications (e.g., success/errors) */}
       <Toaster position="top-right"  />
       <Router>
+        {/* Suspense: Lazy loading with spinner fallback */}
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-screen">
@@ -31,6 +34,7 @@ function App() {
               <Route path="/" element={<Dashboard darkMode={{darkMode, pagesBgMode, componentsBgMode}} toggleDarkMode={toggleDarkMode} />} />
               <Route path="/users" element={<Users darkMode={{darkMode, pagesBgMode, componentsBgMode}} toggleDarkMode={toggleDarkMode}/>} />
               <Route path="/tasks" element={<Tasks darkMode={{darkMode, pagesBgMode, componentsBgMode}} toggleDarkMode={toggleDarkMode}/>} />
+              {/* Fallback: Redirect unknown routes to home */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

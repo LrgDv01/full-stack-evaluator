@@ -6,6 +6,7 @@ import './styles/globals.css';
 import { Provider } from 'react-redux';
 // import { store } from './store/index.js';
 
+// Entry: StrictMode for dev checks; TODO: Uncomment Provider for Redux
 ReactDoom.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* <Provider store={store}> */}
