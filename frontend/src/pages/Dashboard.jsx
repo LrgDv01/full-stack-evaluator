@@ -10,17 +10,20 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { CheckCircle2, ClipboardList, Users } from 'lucide-react';
-import { motion } from 'framer-motion'; // 👈 optional if you want a fade-in wrapper
+import { CheckCircle2, ClipboardList, Users, Clock4 } from 'lucide-react';
+import { motion } from 'framer-motion'; //  for fade-in wrapper
 
 export default function Dashboard({darkMode}) {
   const { tasks } = useTaskManagement();
   const { users } = useUsers();
 
+  // Stats: Derived from tasks/users for overview
   const totalTasks = tasks.length;
+  const pendingTasks = tasks.filter((t) => !t.isCompleted).length; 
   const completedTasks = tasks.filter((t) => t.isCompleted).length;
   const totalUsers = users.length;
 
+  // Chart data: Per-user totals; split name by @ for brevity
   const chartData = users.map((u) => ({
     name: u.email.split('@')[0],
     total: tasks.filter((t) => t.userId === u.id).length,
@@ -38,6 +41,12 @@ export default function Dashboard({darkMode}) {
       title: 'Users',
       value: totalUsers,
       icon: Users,
+      color: 'bg-blue-500',
+    },
+    {
+      title: 'Pending',
+      value: pendingTasks,
+      icon: Clock4,
       color: 'bg-amber-500',
     },
     {
@@ -52,22 +61,23 @@ export default function Dashboard({darkMode}) {
     <div className={`space-y-8 p-7 h-full ${darkMode.pagesBgMode} `}>
       <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
       {/* --- Stat Cards Section --- */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-4">
       
         {statCards.map(({ title, value, icon: Icon, color }) => (
+          // Motion: Hover scale for interactivity
           <motion.div
             key={title}
-            className={`p-6 rounded-xl shadow-md flex items-center justify-between
+            className={`p-6 rounded-xl shadow-md flex items-center justify-between 
              ${darkMode.componentsBgMode}`}
             whileHover={{ scale: 1.02 }}
             transition={{ type: 'spring', stiffness: 300, damping: 15 }}
           >
-            <div className={`p-3 rounded-full ${color} text-white shadow-md`}>
-              <Icon className="w-6 h-6" />
+            <div className={`p-3 rounded-full ${color} text-white shadow-md `}>
+              <Icon className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{value}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{title}</p>
+              <p className="text-2xl font-bold">{value}</p>
+              <p className="text-sm ">{title}</p>
             </div>
           </motion.div>
         ))}
@@ -75,19 +85,21 @@ export default function Dashboard({darkMode}) {
 
       {/* --- Chart Section --- */}
       {chartData.length > 0 ? (
+        // Motion: Fade-in for load polish
         <motion.div
-          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md"
+          className={`bg-white p-6 rounded-xl shadow-md text-white ${darkMode.darkMode ? 'dark:bg-gray-800' : 'dark:bg-gray-600'}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <h2 className="mb-5 text-xl font-semibold text-gray-800 dark:text-gray-100">
+          <h2 className="mb-5 text-xl font-semibold  ">
             Tasks per User
           </h2>
-          <div className="h-80">
+          <div className="h-80 ">
+            {/* Responsive: Full-width chart with tooltips */}
             <ResponsiveContainer>
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
+                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.6} />
                 <XAxis
                   dataKey="name"
                   tick={{ fill: 'currentColor' }}
@@ -109,6 +121,7 @@ export default function Dashboard({darkMode}) {
                 <Legend />
 
                 {/* --- Animated Bars --- */}
+                {/* Bar: Radius for rounded tops; animation for engagement */}
                 <Bar
                   dataKey="total"
                   fill="#6366f1"

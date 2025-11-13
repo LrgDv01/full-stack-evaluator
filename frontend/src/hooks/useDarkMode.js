@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export function useDarkMode() {
+  // Init: From localStorage or system pref for persistence
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     if (saved !== null) return saved === 'true';
@@ -17,6 +18,7 @@ export function useDarkMode() {
     localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
 
+  // Sync: Handles multi-tab changes via storage event
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'darkMode') {
